@@ -10,13 +10,13 @@
         <div class="text-subtitle2">Bienvenido</div>
       </div>
 
-      <form @submit.prevent="iniciarSesion">
+      <form action="#">
         <div class="row">
           <i class="fas fa-user"></i>
           <input
-            v-model="email"
+            v-model="username"
             type="text"
-            placeholder="Correo Electrónico"
+            placeholder="Username"
             required
           />
         </div>
@@ -25,13 +25,13 @@
           <input
             v-model="password"
             type="password"
-            placeholder="Contraseña"
+            placeholder="Password"
             required
           />
         </div>
         <div class="pass"><a href="#">¿Olvidaste tu contraseña?</a></div>
         <div class="row button">
-          <input type="submit" value="Ingresar" />
+          <input type="button" value="Login" @click="iniciarSesion" />
         </div>
         <div class="signup-link">
           ¿No tienes cuenta? <a href="#">Regístrate ahora</a>
@@ -208,25 +208,39 @@ export default {
   name: "LoginForm",
   data() {
     return {
-      email: "",
+      username: "",
       password: "",
     };
   },
   methods: {
     iniciarSesion() {
-      const endpointURL = "/api/User/SignIn";
+      const endpointURL = "/api/Personal/SignIn";
+      //console.log("aaa", this.username, this.password);
       const user = {
-        email: this.email,
+        username: this.username,
         password: this.password,
       };
+      //console.log(user);
       this.$api
         .post(endpointURL, user)
         .then((response) => {
           console.log("Respuesta del servidor:", response);
-          this.$router.push({ path: "/" });
+          this.$q.notify({
+            message: "Inicio exitoso",
+            color: "positive",
+            timeout: 3000,
+            position: "top",
+          });
+          this.$router.push("/");
         })
         .catch((error) => {
-          console.log("Error:", error);
+          //console.log("Esto es error GERSON", user);
+          this.$q.notify({
+            message: "Usuario no válido",
+            color: "negative",
+            timeout: 3000,
+            position: "bottom",
+          });
         });
     },
   },
