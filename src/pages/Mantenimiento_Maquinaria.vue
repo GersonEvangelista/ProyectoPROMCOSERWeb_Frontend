@@ -192,7 +192,7 @@ export default {
       if (this.isEditing) {
         // Actualizar maquinaria existente
         this.$api
-          .put(`/Maquinaria/${this.form.id_maquinaria}`, this.form)
+          .put(`/api/Maquinaria/${this.form.id_maquinaria}`, this.form)
           .then(() => {
             const index = this.machinery.findIndex(
               (m) => m.id_maquinaria === this.form.id_maquinaria
@@ -208,7 +208,7 @@ export default {
       } else {
         // Agregar nueva maquinaria
         this.$api
-          .post("/Maquinaria", this.form)
+          .post("/api/Maquinaria", this.form)
           .then((response) => {
             this.machinery.push(response.data);
             alert("Maquinaria agregada exitosamente.");
@@ -231,7 +231,7 @@ export default {
     },
     deleteMachine(id) {
       this.$api
-        .delete(`/Maquinaria/${id}`)
+        .delete(`/api/Maquinaria/${id}`)
         .then(() => {
           this.machinery = this.machinery.filter(
             (machine) => machine.id_maquinaria !== id
@@ -258,7 +258,7 @@ export default {
       };
     },
     fetchMachineryData() {
-      let endpointURL = "/Maquinaria";
+      let endpointURL = "/api/Maquinaria";
       this.$api
         .get(endpointURL)
         .then((response) => {

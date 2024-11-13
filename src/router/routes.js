@@ -8,7 +8,15 @@ const routes = [
         path: "Mantenimiento_Maquinaria",
         component: () => import("src/pages/Mantenimiento_Maquinaria.vue"),
       },
+      {
+        path: "loginold",
+        component: () => import("components/Login/LoginForm.vue"),
+      },
     ],
+  },
+  {
+    path: "/login",
+    component: () => import("components/Login/LoginForm.vue"),
   },
 
   // Always leave this as last one,
