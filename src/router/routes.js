@@ -8,6 +8,10 @@ const routes = [
         path: "Mantenimiento_Maquinaria",
         component: () => import("src/pages/Mantenimiento_Maquinaria.vue"),
       },
+      {
+        path: "cliente",
+        component: () => import("src/components/Cliente/clienteForm.vue"),
+      }, // Nueva ruta para Cliente
     ],
   },
   {
