@@ -34,7 +34,8 @@
           <input type="button" value="Login" @click="iniciarSesion" />
         </div>
         <div class="signup-link">
-          ¿No tienes cuenta? <a href="#">Regístrate ahora</a>
+          ¿No tienes cuenta?
+          <router-link to="/loginRegistro">Regístrate ahora</router-link>
         </div>
       </form>
     </div>
@@ -224,7 +225,7 @@ export default {
       this.$api
         .post(endpointURL, user)
         .then((response) => {
-          console.log("Respuesta del servidor:", response);
+          //console.log("Respuesta del servidor:", response);
           this.$q.notify({
             message: "Inicio exitoso",
             color: "positive",
@@ -234,7 +235,7 @@ export default {
           this.$router.push("/");
         })
         .catch((error) => {
-          //console.log("Esto es error GERSON", user);
+          //console.log("Esto es error", user);
           this.$q.notify({
             message: "Usuario no válido",
             color: "negative",
