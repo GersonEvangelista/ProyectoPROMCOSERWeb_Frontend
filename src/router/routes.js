@@ -11,7 +11,15 @@ const routes = [
       {
         path: "cliente",
         component: () => import("src/components/Cliente/clienteForm.vue"),
-      }, // Nueva ruta para Cliente
+      },
+      {
+        path: "parteDiario",
+        component: () => import("src/components/ParteDiario/ParteDiarioForm.vue"),
+      },
+      {
+        path: "personal",
+        component: () => import("src/components/Personal/PersonalForm.vue"),
+      }
     ],
   },
   {

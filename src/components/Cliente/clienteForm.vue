@@ -12,14 +12,6 @@
         <div class="header-divider"></div>
         <h1 class="title">Gestión de Clientes</h1>
         <div class="search-container">
-          <input
-            type="search"
-            id="search"
-            placeholder="Buscar cliente..."
-            class="search-input"
-            v-model="searchQuery"
-            @input="filtrarClientes"
-          />
           <button
             type="button"
             id="addClientBtn"
@@ -181,10 +173,7 @@
         <div class="dialog-content">
           <h2 id="dialogTitle">Agregar Nuevo Cliente</h2>
           <form id="clientForm">
-            <div class="form-group">
-              <label for="idCliente">ID Cliente</label>
-              <input type="number" id="idCliente" name="idCliente" required />
-            </div>
+            
             <div class="form-group">
               <label for="tipoCliente">Tipo Cliente</label>
               <select

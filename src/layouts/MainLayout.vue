@@ -11,19 +11,29 @@
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title> PROMCOSER </q-toolbar-title>
+        <q-toolbar-title>PROMCOSER</q-toolbar-title>
+
       </q-toolbar>
     </q-header>
 
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
       <q-list>
-        <q-item-label header> Essential Links </q-item-label>
+        <q-item-label header>Secciones</q-item-label>
 
-        <EssentialLink
+        <q-item
           v-for="link in linksList"
           :key="link.title"
-          v-bind="link"
-        />
+          clickable
+          @click="goToPage(link.route)"
+        >
+          <q-item-section avatar>
+            <q-icon :name="link.icon" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>{{ link.title }}</q-item-label>
+            <q-item-label caption>{{ link.caption }}</q-item-label>
+          </q-item-section>
+        </q-item>
       </q-list>
     </q-drawer>
 
@@ -35,65 +45,36 @@
 
 <script>
 import { defineComponent, ref } from "vue";
-import EssentialLink from "components/EssentialLink.vue";
 
 const linksList = [
   {
-    title: "Docs",
-    caption: "quasar.dev",
-    icon: "school",
-    link: "https://quasar.dev",
+    title: "Maquinaria",
+    caption: "Gestión de maquinaria",
+    icon: "build",
+    route: "/Mantenimiento_Maquinaria",
   },
   {
-    title: "Edit",
-    caption: "quasar.dev",
-    icon: "las la-edit",
-    link: "https://quasar.dev",
+    title: "Personal",
+    caption: "Gestión de personal",
+    icon: "people",
+    route: "/personal",
   },
   {
-    title: "Github",
-    caption: "github.com/quasarframework",
-    icon: "code",
-    link: "https://github.com/quasarframework",
+    title: "Cliente",
+    caption: "Gestión de clientes",
+    icon: "person",
+    route: "/cliente",
   },
   {
-    title: "Discord Chat Channel",
-    caption: "chat.quasar.dev",
-    icon: "chat",
-    link: "https://chat.quasar.dev",
-  },
-  {
-    title: "Forum",
-    caption: "forum.quasar.dev",
-    icon: "record_voice_over",
-    link: "https://forum.quasar.dev",
-  },
-  {
-    title: "Twitter",
-    caption: "@quasarframework",
-    icon: "rss_feed",
-    link: "https://twitter.quasar.dev",
-  },
-  {
-    title: "Facebook",
-    caption: "@QuasarFramework",
-    icon: "public",
-    link: "https://facebook.quasar.dev",
-  },
-  {
-    title: "Quasar Awesome",
-    caption: "Community Quasar projects",
-    icon: "favorite",
-    link: "https://awesome.quasar.dev",
+    title: "Parte Diario",
+    caption: "Registro de parte diario",
+    icon: "book",
+    route: "/parteDiario",
   },
 ];
 
 export default defineComponent({
   name: "MainLayout",
-
-  components: {
-    EssentialLink,
-  },
 
   data() {
     return {
@@ -106,6 +87,14 @@ export default defineComponent({
     toggleLeftDrawer() {
       this.leftDrawerOpen = !this.leftDrawerOpen;
     },
+    goToPage(route) {
+      this.$router.push(route);
+      this.leftDrawerOpen = false; // Cierra el menú después de navegar
+    },
   },
 });
 </script>
+
+<style scoped>
+/* Puedes añadir estilos aquí si lo deseas */
+</style>
