@@ -12,6 +12,14 @@
         <div class="header-divider"></div>
         <h1 class="title">Gestión de Clientes</h1>
         <div class="search-container">
+          <input
+            type="search"
+            id="search"
+            placeholder="Buscar cliente..."
+            class="search-input"
+            v-model="searchQuery"
+            @input="filtrarClientes"
+          />
           <button
             type="button"
             id="addClientBtn"
@@ -65,11 +73,11 @@
                 />
               </th>
               <th>
-                <input
-                  type="text"
-                  v-model="filters.tipoCliente"
-                  placeholder="Filtrar..."
-                />
+                <select v-model="filters.tipoCliente">
+                  <option value="">Todos</option>
+                  <option value="natural">Natural</option>
+                  <option value="empresa">Empresa</option>
+                </select>
               </th>
               <th>
                 <input
@@ -114,11 +122,11 @@
                 />
               </th>
               <th>
-                <input
-                  type="text"
-                  v-model="filters.estado"
-                  placeholder="Filtrar..."
-                />
+                <select v-model="filters.estado">
+                  <option value="">Todos</option>
+                  <option value="true">Activo</option>
+                  <option value="false">Inactivo</option>
+                </select>
               </th>
               <th>
                 <input
@@ -173,7 +181,6 @@
         <div class="dialog-content">
           <h2 id="dialogTitle">Agregar Nuevo Cliente</h2>
           <form id="clientForm">
-            
             <div class="form-group">
               <label for="tipoCliente">Tipo Cliente</label>
               <select
@@ -277,16 +284,6 @@
         <div class="dialog-content">
           <h2 id="dialogTitle">Actualizar datos del Cliente</h2>
           <form id="clientForm">
-            <div class="form-group">
-              <label for="idCliente">ID Cliente</label>
-              <input
-                type="number"
-                id="idCliente"
-                v-model="updateIdCliente"
-                name="idCliente"
-                required
-              />
-            </div>
             <div class="form-group">
               <label for="tipoCliente">Tipo Cliente</label>
               <select

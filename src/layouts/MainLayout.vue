@@ -96,5 +96,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* Puedes añadir estilos aquí si lo deseas */
+
+
 </style>

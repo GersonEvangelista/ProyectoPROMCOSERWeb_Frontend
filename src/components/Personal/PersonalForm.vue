@@ -1,16 +1,25 @@
 <template>
   <div class="container">
     <header class="header">
-      <h1 class="title">Gestión de Personal</h1>
-      <div class="search-container">
-        <input
-          type="search"
-          id="search"
-          v-model="searchTerm"
-          placeholder="Buscar personal..."
-          class="search-input"
+      <div class="logo-container">
+        <img
+          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-m9p9F1866neG0zpLvS5528VER0rVXF.png"
+          alt="PROMCOSER Logo"
+          class="logo"
         />
-        <button @click="showDialog()" class="add-button">Agregar</button>
+      </div>
+      <div class="header-content">
+        <h1 class="title">Gestión de Personal</h1>
+        <div class="search-container">
+          <input
+            type="search"
+            id="search"
+            v-model="searchTerm"
+            placeholder="Buscar personal..."
+            class="search-input"
+          />
+          <button @click="showDialog()" class="add-button">Agregar</button>
+        </div>
       </div>
     </header>
 
@@ -35,7 +44,7 @@
             <td>{{ person.idPersonal }}</td>
             <td>{{ person.nombre }}</td>
             <td>{{ person.apellido }}</td>
-            <td>{{ person.idRol }}</td>
+            <td>{{ getRoleName(person.idRol) }}</td>
             <td>{{ person.telefono }}</td>
             <td>{{ person.correo }}</td>
             <td>{{ person.dni }}</td>
@@ -82,12 +91,11 @@
           </div>
           <div class="form-group">
             <label for="idRol">Rol</label>
-            <input
-              type="number"
-              v-model="form.idRol"
-              required
-              class="form-input"
-            />
+            <select v-model="form.idRol" required class="form-input">
+              <option value="1">Ingeniero</option>
+              <option value="2">Operario</option>
+              <option value="3">Administrador</option>
+            </select>
           </div>
           <div class="form-group">
             <label for="telefono">Teléfono</label>
@@ -123,15 +131,6 @@
             <input
               type="date"
               v-model="form.fechNacimiento"
-              required
-              class="form-input"
-            />
-          </div>
-          <div class="form-group">
-            <label for="idUbigeo">Ubicación</label>
-            <input
-              type="number"
-              v-model="form.idUbigeo"
               required
               class="form-input"
             />
@@ -183,7 +182,6 @@ export default {
         dni: "",
         estado: true,
         fechNacimiento: "",
-        idUbigeo: 0,
         username: "",
         password: "",
       },
@@ -215,7 +213,18 @@ export default {
       this.isEditing = !!person;
       if (person) {
         this.form = { ...person };
-        this.form.fechNacimiento = this.form.fechNacimiento.split("T")[0];
+
+        // Llamada a la API para obtener datos adicionales basados en el id
+        this.$api
+          .get(`/api/Personal/${this.form.idPersonal}`)
+          .then((response) => {
+            // Actualiza 'form' con los datos obtenidos
+            this.form = { ...response.data };
+            this.form.fechNacimiento = this.form.fechNacimiento.split("T")[0];
+          })
+          .catch((error) => {
+            console.error("Error al obtener los datos del personal:", error);
+          });
       } else {
         this.form = {
           idPersonal: 0,
@@ -227,7 +236,6 @@ export default {
           dni: "",
           estado: true,
           fechNacimiento: "",
-          idUbigeo: 0,
           username: "",
           password: "",
         };
@@ -237,21 +245,35 @@ export default {
     hideDialog() {
       this.isDialogVisible = false;
     },
-    submitForm() {
-      const formData = { ...this.form };
+     submitForm() {
+      // Validate input fields
+      if (!this.validateForm()) {
+        return;
+      }
+
+      const formData = { ...this.form, idUbigeo: 1 };
       formData.fechNacimiento = new Date(formData.fechNacimiento).toISOString();
 
       if (this.isEditing) {
         // Actualizar personal existente
-        this.$api
+         this.$api
           .put(`/api/Personal/${this.form.idPersonal}`, formData)
           .then(() => {
+            this.$q.notify({
+              message: "Actualización exitosa",
+              color: "positive",
+              timeout: 3000,
+              position: "top",
+            });
             const index = this.personal.findIndex(
               (p) => p.idPersonal === this.form.idPersonal
             );
+            console.log(formData);
             this.personal.splice(index, 1, { ...formData });
-            alert("Personal actualizado exitosamente.");
             this.hideDialog();
+            setTimeout(() => {
+              this.fetchPersonalData();
+            }, 1000);
           })
           .catch((error) => {
             console.error("Error al actualizar el personal: ", error);
@@ -259,18 +281,101 @@ export default {
           });
       } else {
         // Agregar nuevo personal
-        this.$api
+         this.$api
           .post("/api/Personal", formData)
           .then((response) => {
-            this.personal.push(response.data);
-            alert("Personal agregado exitosamente.");
+            this.$q.notify({
+              message: "Registro exitoso",
+              color: "positive",
+              timeout: 3000,
+              position: "top",
+            });
+            const newPerson = {
+              idPersonal: response.data.idPersonal,
+              nombre: response.data.nombre,
+              apellido: response.data.apellido,
+              idRol: response.data.idRol,
+              telefono: response.data.telefono,
+              correo: response.data.correo,
+              dni: response.data.dni,
+              estado: response.data.estado,
+              fechNacimiento: response.data.fechNacimiento,
+              username: response.data.username,
+              password: response.data.password,
+            };
+            this.personal.push(newPerson);
             this.hideDialog();
+            setTimeout(() => {
+              this.fetchPersonalData();
+            }, 1000);
           })
           .catch((error) => {
             console.error("Error al agregar el personal: ", error);
             alert("Ocurrió un error al agregar el personal.");
           });
       }
+    },
+
+    validateForm() {
+      // Validate name and surname (only letters)
+      if (
+        !/^[a-zA-Z\s]+$/.test(this.form.nombre) ||
+        !/^[a-zA-Z\s]+$/.test(this.form.apellido)
+      ) {
+        this.$q.notify({
+          message: "El nombre y apellido deben contener solo letras.",
+          color: "red",
+          timeout: 3000,
+          position: "top",
+        });
+        return false;
+      }
+
+      // Validate phone number (9 digits)
+      if (!/^\d{9}$/.test(this.form.telefono)) {
+        this.$q.notify({
+          message: "El número de teléfono debe contener 9 dígitos.",
+          color: "red",
+          timeout: 3000,
+          position: "top",
+        });
+        return false;
+      }
+
+      // Validate email (must contain @)
+      if (!this.form.correo.includes("@")) {
+        this.$q.notify({
+          message: "El correo electrónico debe contener @.",
+          color: "red",
+          timeout: 3000,
+          position: "top",
+        });
+        return false;
+      }
+
+      // Validate DNI (8 digits)
+      if (!/^\d{8}$/.test(this.form.dni)) {
+        this.$q.notify({
+          message: "El DNI debe contener 8 dígitos numéricos.",
+          color: "red",
+          timeout: 3000,
+          position: "top",
+        });
+        return false;
+      }
+
+      // Validate password (more than 5 characters)
+      if (this.form.password.length <= 5) {
+        this.$q.notify({
+          message: "La contraseña debe tener más de 5 caracteres.",
+          color: "red",
+          timeout: 3000,
+          position: "top",
+        });
+        return false;
+      }
+
+      return true;
     },
     confirmDeletePerson(id) {
       const confirmed = confirm(
@@ -284,10 +389,16 @@ export default {
       this.$api
         .delete(`/api/Personal/${id}`)
         .then(() => {
+          this.$q.notify({
+            message: "Eliminación exitosa",
+            color: "positive",
+            timeout: 3000,
+            position: "top",
+          });
           this.personal = this.personal.filter(
             (person) => person.idPersonal !== id
           );
-          alert("Personal eliminado exitosamente.");
+          //alert("Personal eliminado exitosamente.");
         })
         .catch((error) => {
           console.error("Error al eliminar el personal: ", error);
@@ -306,15 +417,25 @@ export default {
           console.error("Error al obtener los datos del personal: ", error);
         });
     },
+    getRoleName(idRol) {
+      switch (idRol) {
+        case 1:
+          return "Ingeniero";
+        case 2:
+          return "Operario";
+        case 3:
+          return "Administrador";
+        default:
+          return "Desconocido";
+      }
+    },
   },
   mounted() {
     this.fetchPersonalData();
   },
 };
 </script>
-
 <style>
-/* Styles remain the same as in the original code */
 :root {
   --primary-color: #0066cc;
   --primary-hover: #0052a3;
@@ -361,28 +482,38 @@ body {
 }
 
 .header {
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  margin-bottom: 20px;
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
+  align-items: flex-start;
+  padding: 24px;
+}
+
+.logo-container {
+  width: 200px;
+  height: 80px;
+  margin-right: 20px;
+}
+
+.logo {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .title {
-  font-size: 24px;
-  font-weight: bold;
-  color: var(--primary-color);
-  margin: 0;
-  flex-grow: 1;
+  color: #0066cc;
+  margin: 0 0 15px 0;
+  font-size: 28px;
 }
 
 .search-container {
   display: flex;
   align-items: center;
-  margin-top: 10px;
   width: 100%;
 }
 
@@ -456,19 +587,38 @@ body {
   background-color: #ffffff;
   padding: 20px;
   border-radius: 8px;
-  max-width: 500px;
+  max-width: 400px;
   width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
+.dialog-content h2 {
+  text-align: center;
+  color: var(--primary-color);
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.dialog-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
 .form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin-bottom: 15px;
 }
 
 .form-group label {
-  display: block;
-  margin-bottom: 5px;
   font-weight: bold;
+  font-size: 16px;
+  color: var(--primary-color);
+  margin-bottom: 5px;
 }
 
 .form-group .form-input {
@@ -476,6 +626,8 @@ body {
   padding: 8px;
   border: 1px solid var(--border-color);
   border-radius: 4px;
+  font-size: 14px;
+  text-align: center;
 }
 
 .form-actions {

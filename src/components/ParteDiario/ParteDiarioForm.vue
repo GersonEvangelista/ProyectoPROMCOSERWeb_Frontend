@@ -1,11 +1,11 @@
 <template>
   <q-page padding class="parte-diario-page">
     <div class="logo-container">
-          <img
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-m9p9F1866neG0zpLvS5528VER0rVXF.png"
-            alt="PROMCOSER Logo"
-            class="logo"
-          />
+      <img
+        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-m9p9F1866neG0zpLvS5528VER0rVXF.png"
+        alt="PROMCOSER Logo"
+        class="logo"
+      />
     </div>
     <h1 class="text-h4 q-mb-md text-center text-primary">Parte Diario</h1>
     <q-card class="q-mb-md form-card">
@@ -19,8 +19,10 @@
             <div class="col-12 col-md-6">
               <q-select
                 filled
-                v-model="parteDiario.cliente"
-                :options="clientesOptions"
+                v-model="idClienteSeleccionado"
+                :options="clientesAllOptions"
+                option-value="idCliente"
+                option-label="nombre"
                 label="Cliente"
                 use-input
                 @filter="filterClientes"
@@ -321,10 +323,12 @@ export default {
         detalles: [],
       },
       clientesOptions: [],
+      clientesAllOptions: [],
       maquinariasOptions: [],
       operadoresOptions: [],
       idMaquinaria: null,
       idCliente: null,
+      idClienteSeleccionado: null,
       idOperador: null,
     };
   },
@@ -333,8 +337,13 @@ export default {
     async fetchClientes() {
       try {
         const response = await this.$api.get("/api/Clientes");
-        //console.log(response)
+        console.log(response);
         this.clientesOptions = response.data.map((cliente) => cliente.nombre);
+        this.clientesAllOptions = response.data;
+        console.log("Clientes: " + JSON.stringify(this.clientesAllOptions));
+        console.log(
+          "Cliente seleccionado: " + JSON.stringify(this.idClienteSeleccionado)
+        );
       } catch (error) {
         console.error("Error al obtener los clientes:", error);
       }
@@ -353,7 +362,7 @@ export default {
     // Función para obtener los operadores desde la API
     async fetchOperadores() {
       try {
-        const response = await this.$api.get("/api/Personal");
+        const response = await this.$api.get("/api/Personal/GetOperadores");
         this.operadoresOptions = response.data.map(
           (personal) => personal.nombre
         );
@@ -429,27 +438,31 @@ export default {
 
     // Función para guardar el parte diario
     guardarParteDiario() {
+      console.log(
+        "Cliente seleccionado: " + this.idClienteSeleccionado.idCliente
+      );
+      return;
       if (this.parteDiario.cliente && this.parteDiario.fecha) {
         this.partesDiarios.push({
           id: Date.now(),
-          ...this.parteDiario
+          ...this.parteDiario,
         });
         this.parteDiario = {
-          cliente: '',
-          placaMaquina: '',
-          fecha: '',
-          operador: '',
-          horometroInicio: '',
-          horometroFinal: '',
-          lugarTrabajo: '',
-          petroleo: '',
-          aceiteHidraulico: '',
-          proximoMantenimiento: '',
+          cliente: "",
+          placaMaquina: "",
+          fecha: "",
+          operador: "",
+          horometroInicio: "",
+          horometroFinal: "",
+          lugarTrabajo: "",
+          petroleo: "",
+          aceiteHidraulico: "",
+          proximoMantenimiento: "",
           firmado: false,
-          detalles: []
+          detalles: [],
         };
       }
-    /*
+      /*
     // Función para guardar el parte diario
     guardarParteDiario() {
       //console.log("entro");

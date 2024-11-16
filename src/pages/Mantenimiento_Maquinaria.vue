@@ -312,6 +312,7 @@ export default {
             this.machinery.push(response.data);
             alert("Maquinaria agregada exitosamente.");
             this.hideDialog();
+            this.fetchMachineryData();
           })
           .catch((error) => {
             console.error(
@@ -408,10 +409,15 @@ body {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centra el contenido horizontalmente */
+  align-items: center;
 }
 
+.column-filter {
+  width: 130px;
+  font-size: 12px;
+}
 .header {
+  width: 95%;
   background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -450,8 +456,6 @@ body {
 .search-container {
   display: flex;
   align-items: center;
-  margin-top: 10px;
-  width: 100%;
 }
 .search-input {
   flex-grow: 1;
@@ -481,8 +485,8 @@ body {
   margin-right: 5px;
 }
 .machinery-table {
-  width: 100%;
-  max-width: 800px; /* Limita el ancho máximo para mejor presentación */
+  width: auto;
+  max-width: 1px;
   border-collapse: collapse;
   background-color: #ffffff;
   border-radius: 8px;
@@ -493,7 +497,7 @@ body {
 
 .machinery-table th,
 .machinery-table td {
-  padding: 12px;
+  padding: 8px;
   text-align: left;
   border-bottom: 1px solid var(--border-color);
 }
@@ -558,38 +562,35 @@ body {
 .submit-button:hover {
   background-color: var(--primary-hover);
 }
-
-
-
 .dialog {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center; /* Centra el contenido verticalmente */
-  justify-content: center; /* Centra el contenido horizontalmente */
+  align-items: center;
+  justify-content: center;
   z-index: 1;
 }
 .dialog-content {
-  width: 80%; /* Ajusta el ancho según tus necesidades */
-  max-width: 500px; /* Limita el ancho máximo para evitar que se expanda demasiado */
-  max-height: 90%; /* Limita la altura para permitir scroll */
+  width: 90%;
+  max-width: 600px;
+  max-height: 90%;
   background-color: white;
   padding: 20px;
   border-radius: 8px;
-  overflow-y: auto; /* Permite desplazamiento vertical solo dentro del cuadro */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Agrega sombra para mayor enfoque */
+  overflow-y: 90vh;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 h2#dialogTitle {
-  font-size: 26px; /* Aumenta un poco el tamaño del título */
+  font-size: 26px;
   margin-bottom: 20px;
   font-weight: bold;
   color: var(--primary-color);
   text-align: center;
-  text-transform: uppercase; /* Cambia a mayúsculas para dar más énfasis */
+  text-transform: uppercase;
 }
 
 .form-group {
@@ -599,17 +600,17 @@ h2#dialogTitle {
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
-  font-size: 15px; /* Aumenta el tamaño de la etiqueta para mejor visibilidad */
-  color: var(--text-color); /* Asegura que el color sea consistente */
+  font-size: 15px;
+  color: var(--text-color);
 }
 .form-group input,
 .form-group select {
-  width: 100%; /* Asegura que los select también ocupen el ancho completo */
-  padding: 10px; /* Incrementa el padding para una experiencia de entrada más cómoda */
+  width: 100%;
+  padding: 10px;
   border: 1px solid var(--border-color);
-  border-radius: 6px; /* Un borde ligeramente más redondeado para un aspecto moderno */
+  border-radius: 6px;
   font-size: 15px;
-  background-color: #f9f9f9; /* Agrega un color de fondo claro para diferenciar los campos */
+  background-color: #f9f9f9;
   transition: border-color 0.3s, background-color 0.3s;
 }
 .form-group input:focus,
@@ -643,10 +644,10 @@ h2#dialogTitle {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center; /* Centra el contenido verticalmente */
-  justify-content: center; /* Centra el contenido horizontalmente */
+  align-items: center;
+  justify-content: center;
   z-index: 1;
 }
 .dialog-content {
