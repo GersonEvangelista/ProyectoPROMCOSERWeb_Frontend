@@ -40,9 +40,11 @@
             <div class="col-12 col-md-6">
               <q-select
                 filled
-                v-model="parteDiario.placaMaquina"
-                :options="maquinariasOptions"
-                label="Placa de la Máquina"
+                v-model="idMaquinariaSeleccionado"
+                :options="maquinariasAllOptions"
+                option-value="idMaquinaria"
+                option-label="placa"
+                label = "Placa de la maquina"
                 use-input
                 @filter="filterMaquinarias"
                 :rules="[(val) => !!val || 'Campo requerido']"
@@ -71,8 +73,10 @@
             <div class="col-12 col-md-6">
               <q-select
                 filled
-                v-model="parteDiario.operador"
-                :options="operadoresOptions"
+                v-model="idOperadorSeleccionado"
+                :options="operadoresAllOptions"
+                option-value = "idPersonal"
+                option-label = "nombre"
                 label="Operador"
                 use-input
                 @filter="filterOperadores"
@@ -325,11 +329,12 @@ export default {
       clientesOptions: [],
       clientesAllOptions: [],
       maquinariasOptions: [],
+      maquinariasAllOptions: [],
       operadoresOptions: [],
-      idMaquinaria: null,
-      idCliente: null,
+      operadoresAllOptions: [],
+      idMaquinariaSeleccionado: null,
       idClienteSeleccionado: null,
-      idOperador: null,
+      idOperadorSeleccionado: null,
     };
   },
   methods: {
@@ -337,13 +342,13 @@ export default {
     async fetchClientes() {
       try {
         const response = await this.$api.get("/api/Clientes");
-        console.log(response);
+        //console.log(response);
         this.clientesOptions = response.data.map((cliente) => cliente.nombre);
         this.clientesAllOptions = response.data;
-        console.log("Clientes: " + JSON.stringify(this.clientesAllOptions));
+       /*  console.log("Clientes: " + JSON.stringify(this.clientesAllOptions));
         console.log(
           "Cliente seleccionado: " + JSON.stringify(this.idClienteSeleccionado)
-        );
+        ); */
       } catch (error) {
         console.error("Error al obtener los clientes:", error);
       }
@@ -354,6 +359,7 @@ export default {
       try {
         const response = await this.$api.get("/api/MaquinariasConS");
         this.maquinariasOptions = response.data.map((maquina) => maquina.placa);
+        this.maquinariasAllOptions = response.data;
       } catch (error) {
         console.error("Error al obtener las maquinarias:", error);
       }
@@ -363,11 +369,10 @@ export default {
     async fetchOperadores() {
       try {
         const response = await this.$api.get("/api/Personal/GetOperadores");
-        this.operadoresOptions = response.data.map(
-          (personal) => personal.nombre
-        );
+        this.operadoresOptions = response.data.map((personal) => personal.nombre);
+        this.operadoresAllOptions = response.data;
       } catch (error) {
-        console.error("Error al obtener las maquinarias:", error);
+        console.error("Error al obtener los operadores:", error);
       }
     },
 
@@ -438,9 +443,11 @@ export default {
 
     // Función para guardar el parte diario
     guardarParteDiario() {
-      console.log(
-        "Cliente seleccionado: " + this.idClienteSeleccionado.idCliente
-      );
+      //console.log(this.idOperadorSeleccionado.idPersonal)
+      this.parteDiario.cliente = this.idClienteSeleccionado.idCliente
+      this.parteDiario.placaMaquina = this.idMaquinariaSeleccionado.idMaquinaria
+      this.parteDiario.operador = this.idOperadorSeleccionado.idPersonal
+      console.log(this.parteDiario)
       return;
       if (this.parteDiario.cliente && this.parteDiario.fecha) {
         this.partesDiarios.push({
