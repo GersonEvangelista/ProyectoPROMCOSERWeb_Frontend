@@ -160,11 +160,44 @@
               <td>{{ cliente.ruc }}</td>
               <td>
                 <button class="edit-button" @click="ActualizarCliente(cliente)">
-                  Editar
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                    ></path>
+                    <path
+                      d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                    ></path>
+                  </svg>
                 </button>
-
                 <button class="delete-button" @click="EliminarCliente(cliente)">
-                  Eliminar
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path
+                      d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                    ></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                  </svg>
                 </button>
               </td>
             </tr>
@@ -771,6 +804,12 @@ body {
   border: none;
   cursor: pointer;
   padding: 4px;
+  transition: opacity 0.3s;
+}
+
+.edit-button:hover,
+.delete-button:hover {
+  opacity: 0.7;
 }
 
 .edit-button svg {
@@ -839,31 +878,31 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center; /* Centra el contenido verticalmente */
-  justify-content: center; /* Centra el contenido horizontalmente */
+  align-items: center;
+  justify-content: center;
   z-index: 1;
 }
 
 .dialog-content {
-  width: 80%; /* Ajusta el ancho según tus necesidades */
-  max-width: 500px; /* Limita el ancho máximo para evitar que se expanda demasiado */
-  max-height: 90%; /* Limita la altura para permitir scroll */
+  width: 80%;
+  max-width: 500px;
+  max-height: 90%;
   background-color: white;
   padding: 20px;
   border-radius: 8px;
-  overflow-y: auto; /* Permite desplazamiento vertical solo dentro del cuadro */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Agrega sombra para mayor enfoque */
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 h2#dialogTitle {
-  font-size: 26px; /* Aumenta un poco el tamaño del título */
+  font-size: 26px;
   margin-bottom: 20px;
   font-weight: bold;
   color: var(--primary-color);
   text-align: center;
-  text-transform: uppercase; /* Cambia a mayúsculas para dar más énfasis */
+  text-transform: uppercase;
 }
 
 .form-group {
@@ -874,18 +913,18 @@ h2#dialogTitle {
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
-  font-size: 15px; /* Aumenta el tamaño de la etiqueta para mejor visibilidad */
-  color: var(--text-color); /* Asegura que el color sea consistente */
+  font-size: 15px;
+  color: var(--text-color);
 }
 
 .form-group input,
 .form-group select {
-  width: 100%; /* Asegura que los select también ocupen el ancho completo */
-  padding: 10px; /* Incrementa el padding para una experiencia de entrada más cómoda */
+  width: 100%;
+  padding: 10px;
   border: 1px solid var(--border-color);
-  border-radius: 6px; /* Un borde ligeramente más redondeado para un aspecto moderno */
+  border-radius: 6px;
   font-size: 15px;
-  background-color: #f9f9f9; /* Agrega un color de fondo claro para diferenciar los campos */
+  background-color: #f9f9f9;
   transition: border-color 0.3s, background-color 0.3s;
 }
 
@@ -924,10 +963,10 @@ h2#dialogTitle {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center; /* Centra el contenido verticalmente */
-  justify-content: center; /* Centra el contenido horizontalmente */
+  align-items: center;
+  justify-content: center;
   z-index: 1;
 }
 
