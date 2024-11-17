@@ -17,8 +17,27 @@
             v-model="searchTerm"
             placeholder="Buscar personal..."
             class="search-input"
+            @input="applyFilters"
           />
-          <button @click="showDialog()" class="add-button">Agregar</button>
+          <button @click="showDialog()" class="add-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="plus-circle"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            Agregar
+          </button>
         </div>
       </div>
     </header>
@@ -37,6 +56,73 @@
             <th>Estado</th>
             <th>Fecha de Nacimiento</th>
             <th>Acciones</th>
+          </tr>
+          <tr>
+            <th>
+              <input
+                v-model="filters.idPersonal"
+                @input="applyFilters"
+                placeholder="Filtrar ID..."
+              />
+            </th>
+            <th>
+              <input
+                v-model="filters.nombre"
+                @input="applyFilters"
+                placeholder="Filtrar Nombre..."
+              />
+            </th>
+            <th>
+              <input
+                v-model="filters.apellido"
+                @input="applyFilters"
+                placeholder="Filtrar Apellido..."
+              />
+            </th>
+            <th>
+              <select v-model="filters.idRol" @change="applyFilters">
+                <option value="">Todos</option>
+                <option value="1">Administrador</option>
+                <option value="2">Operario</option>
+              </select>
+            </th>
+            <th>
+              <input
+                v-model="filters.telefono"
+                @input="applyFilters"
+                placeholder="Filtrar Teléfono..."
+              />
+            </th>
+            <th>
+              <input
+                v-model="filters.correo"
+                @input="applyFilters"
+                placeholder="Filtrar Correo..."
+              />
+            </th>
+            <th>
+              <input
+                v-model="filters.dni"
+                @input="applyFilters"
+                placeholder="Filtrar DNI..."
+              />
+            </th>
+            <th>
+              <select v-model="filters.estado" @change="applyFilters">
+                <option value="">Todos</option>
+                <option value="true">Activo</option>
+                <option value="false">Inactivo</option>
+              </select>
+            </th>
+            <th>
+              <input
+                v-model="filters.fechNacimiento"
+                @input="applyFilters"
+                placeholder="Filtrar Fecha..."
+                type="date"
+              />
+            </th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -104,7 +190,7 @@
     <div v-if="isDialogVisible" class="dialog">
       <div class="dialog-content">
         <h2>{{ dialogTitle }}</h2>
-        <form @submit.prevent="submitForm">
+        <form @submit.prevent="submitForm" class="form-grid">
           <div class="form-group">
             <label for="nombre">Nombre</label>
             <input
@@ -126,9 +212,8 @@
           <div class="form-group">
             <label for="idRol">Rol</label>
             <select v-model="form.idRol" required class="form-input">
-              <option value="1">Ingeniero</option>
+              <option value="1">Administrador</option>
               <option value="2">Operario</option>
-              <option value="3">Administrador</option>
             </select>
           </div>
           <div class="form-group">
@@ -187,12 +272,10 @@
               class="form-input"
             />
           </div>
-          <div class="form-actions">
-            <button type="submit" class="submit-button">Guardar</button>
-            <button type="button" @click="hideDialog" class="cancel-button">
-              Cancelar
-            </button>
-          </div>
+          <button type="submit" class="submit-button">Guardar</button>
+          <button type="button" @click="hideDialog" class="cancel-button">
+            Cancelar
+          </button>
         </form>
       </div>
     </div>
@@ -221,19 +304,45 @@ export default {
       },
       isDialogVisible: false,
       dialogTitle: "",
+      filters: {
+        idPersonal: "",
+        nombre: "",
+        apellido: "",
+        idRol: "",
+        telefono: "",
+        correo: "",
+        dni: "",
+        estado: "",
+        fechNacimiento: "",
+      },
     };
   },
   computed: {
     filteredPersonal() {
-      if (!this.searchTerm) {
-        return this.personal;
-      }
-      const term = this.searchTerm.toLowerCase();
-      return this.personal.filter((person) =>
-        Object.values(person).some((value) =>
-          value.toString().toLowerCase().includes(term)
-        )
-      );
+      return this.personal.filter((person) => {
+        return (
+          Object.keys(this.filters).every((key) => {
+            if (!this.filters[key]) return true;
+            if (key === "estado") {
+              return person[key].toString() === this.filters[key];
+            }
+            if (key === "fechNacimiento") {
+              return person[key].startsWith(this.filters[key]);
+            }
+            return person[key]
+              .toString()
+              .toLowerCase()
+              .includes(this.filters[key].toLowerCase());
+          }) &&
+          (this.searchTerm === "" ||
+            Object.values(person).some((value) =>
+              value
+                .toString()
+                .toLowerCase()
+                .includes(this.searchTerm.toLowerCase())
+            ))
+        );
+      });
     },
   },
   methods: {
@@ -398,17 +507,6 @@ export default {
         return false;
       }
 
-      // Validate password (more than 5 characters)
-      if (this.form.password.length <= 5) {
-        this.$q.notify({
-          message: "La contraseña debe tener más de 5 caracteres.",
-          color: "red",
-          timeout: 3000,
-          position: "top",
-        });
-        return false;
-      }
-
       return true;
     },
     confirmDeletePerson(id) {
@@ -425,7 +523,7 @@ export default {
         .then(() => {
           this.$q.notify({
             message: "Eliminación exitosa",
-            color: "positive",
+            color: "red",
             timeout: 3000,
             position: "top",
           });
@@ -454,11 +552,9 @@ export default {
     getRoleName(idRol) {
       switch (idRol) {
         case 1:
-          return "Ingeniero";
+          return "Administrador";
         case 2:
           return "Operario";
-        case 3:
-          return "Administrador";
         default:
           return "Desconocido";
       }
@@ -469,6 +565,7 @@ export default {
   },
 };
 </script>
+
 <style>
 :root {
   --primary-color: #0066cc;
@@ -490,33 +587,6 @@ body {
   min-height: 100vh;
 }
 
-.edit-button,
-.delete-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-}
-
-.edit-button svg,
-.delete-button svg {
-  width: 20px;
-  height: 20px;
-}
-
-.edit-button svg {
-  color: #0066cc;
-}
-
-.delete-button svg {
-  color: #ff3333;
-}
-
-.edit-button:hover svg,
-.delete-button:hover svg {
-  opacity: 0.8;
-}
-
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -525,14 +595,19 @@ body {
 
 .header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   padding: 24px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  gap: 24px;
 }
 
 .logo-container {
-  width: 200px;
-  height: 80px;
-  margin-right: 20px;
+  width: 150px;
+  height: 60px;
+  flex-shrink: 0;
 }
 
 .logo {
@@ -543,24 +618,27 @@ body {
 
 .header-content {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   flex-grow: 1;
+  gap: 24px;
 }
 
 .title {
-  color: #0066cc;
-  margin: 0 0 15px 0;
+  color: var(--primary-color);
+  margin: 0;
   font-size: 28px;
+  white-space: nowrap;
 }
 
 .search-container {
   display: flex;
   align-items: center;
+  max-width: 300px;
   width: 100%;
 }
 
 .search-input {
-  flex-grow: 1;
+  width: 100%;
   padding: 8px 12px;
   border: 1px solid var(--border-color);
   border-radius: 4px;
@@ -583,6 +661,12 @@ body {
 
 .add-button:hover {
   background-color: var(--secondary-hover);
+}
+
+.add-button svg {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
 }
 
 .personal-table {
@@ -611,6 +695,42 @@ body {
   background-color: rgba(0, 0, 0, 0.02);
 }
 
+.personal-table th input,
+.personal-table th select {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.edit-button,
+.delete-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.edit-button svg,
+.delete-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.edit-button svg {
+  color: var(--primary-color);
+}
+
+.delete-button svg {
+  color: var(--secondary-color);
+}
+
+.edit-button:hover svg,
+.delete-button:hover svg {
+  opacity: 0.8;
+}
+
 .dialog {
   position: fixed;
   z-index: 1;
@@ -629,9 +749,9 @@ body {
   background-color: #ffffff;
   padding: 20px;
   border-radius: 8px;
-  max-width: 400px;
-  width: 100%;
-  max-height: 80vh;
+  max-width: 1000px;
+  width: 90%;
+  max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
@@ -643,22 +763,22 @@ body {
   margin-bottom: 20px;
 }
 
-.dialog-content form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-bottom: 15px;
+  align-items: flex-start;
+  margin-bottom: 0;
 }
 
 .form-group label {
   font-weight: bold;
-  font-size: 16px;
+  font-size: 14px;
   color: var(--primary-color);
   margin-bottom: 5px;
 }
@@ -669,26 +789,24 @@ body {
   border: 1px solid var(--border-color);
   border-radius: 4px;
   font-size: 14px;
-  text-align: center;
 }
 
-.form-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-}
-
-.submit-button {
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
+.submit-button,
+.cancel-button {
+  grid-column: 3;
+  margin: 0;
   padding: 10px 20px;
   border-radius: 4px;
   font-size: 16px;
   cursor: pointer;
-  flex: 1;
-  margin-right: 10px;
   transition: background-color 0.3s;
+}
+
+.submit-button {
+  grid-row: 3;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
 }
 
 .submit-button:hover {
@@ -696,18 +814,53 @@ body {
 }
 
 .cancel-button {
+  grid-row: 4;
   background-color: var(--secondary-color);
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  flex: 1;
-  transition: background-color 0.3s;
 }
 
 .cancel-button:hover {
   background-color: var(--secondary-hover);
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .logo-container {
+    margin: 0 auto;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .title {
+    text-align: center;
+  }
+
+  .search-container {
+    max-width: none;
+  }
+
+  .add-button {
+    width: 100%;
+    justify-content: center;
+    margin-left: 0;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .submit-button,
+  .cancel-button {
+    grid-column: 1;
+  }
 }
 </style>
