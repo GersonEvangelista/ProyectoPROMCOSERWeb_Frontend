@@ -112,13 +112,47 @@
             <td>{{ machine.estado ? "Activo" : "Inactivo" }}</td>
             <td>
               <button @click="showDialog(machine)" class="edit-button">
-                <i class="la la-edit"></i> Editar
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                  ></path>
+                  <path
+                    d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                  ></path>
+                </svg>
               </button>
               <button
                 @click="confirmDeleteMachine(machine.idMaquinaria)"
                 class="delete-button"
               >
-                <i class="la la-trash"></i> Eliminar
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path
+                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                  ></path>
+                  <line x1="10" y1="11" x2="10" y2="17"></line>
+                  <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
               </button>
             </td>
           </tr>
@@ -416,6 +450,7 @@ body {
   width: 130px;
   font-size: 12px;
 }
+
 .header {
   width: 95%;
   background-color: #ffffff;
@@ -439,6 +474,7 @@ body {
   max-height: 100%;
   object-fit: contain;
 }
+
 .header-divider {
   width: 1px;
   height: 48px;
@@ -446,6 +482,7 @@ body {
   margin: 0 20px;
   display: none;
 }
+
 .title {
   font-size: 24px;
   font-weight: bold;
@@ -453,10 +490,12 @@ body {
   margin: 0;
   flex-grow: 1;
 }
+
 .search-container {
   display: flex;
   align-items: center;
 }
+
 .search-input {
   flex-grow: 1;
   padding: 8px 12px;
@@ -464,6 +503,7 @@ body {
   border-radius: 4px;
   font-size: 14px;
 }
+
 .add-button {
   background-color: var(--secondary-color);
   color: white;
@@ -477,6 +517,7 @@ body {
   margin-left: 10px;
   transition: background-color 0.3s;
 }
+
 .add-button:hover {
   background-color: var(--secondary-hover);
 }
@@ -484,6 +525,7 @@ body {
 .add-button svg {
   margin-right: 5px;
 }
+
 .machinery-table {
   width: auto;
   max-width: 1px;
@@ -492,7 +534,7 @@ body {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin: 0 auto; /* Centra la tabla */
+  margin: 0 auto;
 }
 
 .machinery-table th,
@@ -516,16 +558,25 @@ body {
   display: flex;
   gap: 8px;
 }
+
 .edit-button,
 .delete-button {
   background: none;
   border: none;
   cursor: pointer;
   padding: 4px;
+  transition: opacity 0.3s;
 }
+
+.edit-button:hover,
+.delete-button:hover {
+  opacity: 0.7;
+}
+
 .edit-button svg {
   color: var(--primary-color);
 }
+
 .delete-button svg {
   color: var(--secondary-color);
 }
@@ -562,6 +613,7 @@ body {
 .submit-button:hover {
   background-color: var(--primary-hover);
 }
+
 .dialog {
   position: fixed;
   top: 0;
@@ -574,6 +626,7 @@ body {
   justify-content: center;
   z-index: 1;
 }
+
 .dialog-content {
   width: 90%;
   max-width: 600px;
@@ -581,9 +634,10 @@ body {
   background-color: white;
   padding: 20px;
   border-radius: 8px;
-  overflow-y: 90vh;
+  overflow-y: auto;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+
 h2#dialogTitle {
   font-size: 26px;
   margin-bottom: 20px;
@@ -596,6 +650,7 @@ h2#dialogTitle {
 .form-group {
   margin-bottom: 20px;
 }
+
 .form-group label {
   display: block;
   margin-bottom: 5px;
@@ -603,6 +658,7 @@ h2#dialogTitle {
   font-size: 15px;
   color: var(--text-color);
 }
+
 .form-group input,
 .form-group select {
   width: 100%;
@@ -613,12 +669,14 @@ h2#dialogTitle {
   background-color: #f9f9f9;
   transition: border-color 0.3s, background-color 0.3s;
 }
+
 .form-group input:focus,
 .form-group select:focus {
   border-color: var(--primary-color);
   background-color: #ffffff;
   outline: none;
 }
+
 .submit-button {
   background-color: var(--primary-color);
   color: white;
@@ -631,13 +689,16 @@ h2#dialogTitle {
   font-weight: bold;
   transition: background-color 0.3s, transform 0.2s;
 }
+
 .submit-button:hover {
   background-color: var(--primary-hover);
   transform: scale(1.02);
 }
+
 .submit-button:active {
   transform: scale(0.98);
 }
+
 .dialog {
   position: fixed;
   top: 0;
@@ -650,6 +711,7 @@ h2#dialogTitle {
   justify-content: center;
   z-index: 1;
 }
+
 .dialog-content {
   width: 80%;
   max-width: 400px;
@@ -661,6 +723,7 @@ h2#dialogTitle {
   max-height: 800px;
   overflow-y: auto;
 }
+
 .dialog-content h2 {
   margin-bottom: 10px;
   color: #ff3333;
@@ -673,10 +736,12 @@ h2#dialogTitle {
 .dialog-content p {
   margin-bottom: 20px;
 }
+
 .confirm-buttons {
   display: flex;
   justify-content: space-around;
 }
+
 .confirm-button {
   background-color: #ff3333;
   color: white;
@@ -686,6 +751,7 @@ h2#dialogTitle {
   cursor: pointer;
   font-size: 16px;
 }
+
 .cancel-button {
   background-color: #f50909;
   color: #ffffff;
@@ -698,10 +764,12 @@ h2#dialogTitle {
   font-weight: bold;
   transition: background-color 0.3s, transform 0.2s;
 }
+
 .cancel-button:hover {
   background-color: #aaa;
   transform: scale(1.02);
 }
+
 .cancel-button:active {
   transform: scale(0.98);
 }
