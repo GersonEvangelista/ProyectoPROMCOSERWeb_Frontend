@@ -71,6 +71,12 @@ const linksList = [
     icon: "book",
     route: "/parteDiario",
   },
+  {
+    title: "Reportes",
+    caption: "Descripción y historial de parte diario de maquinaria",
+    icon: "analytics",
+    route: "/reporteParteDiario",
+  },
 ];
 
 export default defineComponent({

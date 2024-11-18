@@ -19,7 +19,12 @@ const routes = [
       {
         path: "personal",
         component: () => import("src/components/Personal/PersonalForm.vue"),
-      }
+      },
+      {
+        path: "reporteParteDiario",
+        component: () =>
+          import("src/components/Reporte/ReporteParteDiario.vue"),
+      },
     ],
   },
   {
