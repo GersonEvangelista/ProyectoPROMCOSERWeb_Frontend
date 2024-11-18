@@ -165,68 +165,71 @@
       <div class="dialog-content">
         <h2>{{ dialogTitle }}</h2>
         <form @submit.prevent="submitForm">
-          <!-- Formulario de entrada para maquinaria -->
-          <div class="form-group">
-            <label>Placa</label>
-            <input
-              type="text"
-              v-model="form.placa"
-              class="form-input"
-              required
-            />
+          <!-- Contenedor de cuadrícula para los campos del formulario -->
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Placa</label>
+              <input
+                type="text"
+                v-model="form.placa"
+                class="form-input"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>Modelo</label>
+              <input
+                type="text"
+                v-model="form.modelo"
+                class="form-input"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>Marca</label>
+              <input
+                type="text"
+                v-model="form.marca"
+                class="form-input"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>Año Compra</label>
+              <input
+                type="number"
+                v-model="form.anioCompra"
+                class="form-input"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>Horómetro Compra</label>
+              <input
+                type="number"
+                v-model="form.horometroCompra"
+                class="form-input"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>Horómetro Actual</label>
+              <input
+                type="number"
+                v-model="form.horometroActual"
+                class="form-input"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>Estado</label>
+              <select v-model="form.estado" class="form-input" required>
+                <option :value="true">Activo</option>
+                <option :value="false">Inactivo</option>
+              </select>
+            </div>
           </div>
-          <div class="form-group">
-            <label>Modelo</label>
-            <input
-              type="text"
-              v-model="form.modelo"
-              class="form-input"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label>Marca</label>
-            <input
-              type="text"
-              v-model="form.marca"
-              class="form-input"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label>Año Compra</label>
-            <input
-              type="number"
-              v-model="form.anioCompra"
-              class="form-input"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label>Horómetro Compra</label>
-            <input
-              type="number"
-              v-model="form.horometroCompra"
-              class="form-input"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label>Horómetro Actual</label>
-            <input
-              type="number"
-              v-model="form.horometroActual"
-              class="form-input"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label>Estado</label>
-            <select v-model="form.estado" class="form-input" required>
-              <option :value="true">Activo</option>
-              <option :value="false">Inactivo</option>
-            </select>
-          </div>
+          <!-- Acciones del formulario -->
           <div class="form-actions">
             <button type="submit" class="submit-button">Guardar</button>
             <button type="button" @click="hideDialog" class="cancel-button">
@@ -322,8 +325,17 @@ export default {
       this.isDialogVisible = false;
     },
     submitForm() {
+      const placaExiste = this.machinery.some(
+        (machine) =>
+          machine.placa === this.form.placa &&
+          (!this.isEditing || machine.idMaquinaria !== this.form.idMaquinaria)
+      );
+      if (placaExiste) {
+        alert("La placa ya existe. Por favor, ingrese una placa única.");
+        return;
+      }
+
       if (this.isEditing) {
-        // Actualizar maquinaria existente
         this.$api
           .put(`/api/Maquinaria/${this.form.idMaquinaria}`, this.form)
           .then(() => {
@@ -335,8 +347,11 @@ export default {
             this.hideDialog();
           })
           .catch((error) => {
-            console.error("Error al actualizar la maquinaria: ", error);
-            alert("Ocurrió un error al actualizar la maquinaria.");
+            const errorMessage =
+              error.response && error.response.data
+                ? error.response.data
+                : error.message;
+            alert("Error al actualizar la maquinaria: " + errorMessage);
           });
       } else {
         const { idMaquinaria, ...maquinariaData } = this.form;
@@ -349,19 +364,15 @@ export default {
             this.fetchMachineryData();
           })
           .catch((error) => {
-            console.error(
-              "Error al agregar la maquinaria: ",
-              error.response ? error.response.data : error.message
-            );
-            alert(
-              "Ocurrió un error al agregar la maquinaria. Detalles: " +
-                (error.response
-                  ? JSON.stringify(error.response.data)
-                  : error.message)
-            );
+            const errorMessage =
+              error.response && error.response.data
+                ? error.response.data
+                : error.message;
+            alert("Error al agregar la maquinaria: " + errorMessage);
           });
       }
     },
+
     confirmDeleteMachine(id) {
       const confirmed = confirm(
         "¿Estás seguro de que desea eliminar esta maquinaria?"
@@ -450,7 +461,6 @@ body {
   width: 130px;
   font-size: 12px;
 }
-
 .header {
   width: 95%;
   background-color: #ffffff;
@@ -474,7 +484,6 @@ body {
   max-height: 100%;
   object-fit: contain;
 }
-
 .header-divider {
   width: 1px;
   height: 48px;
@@ -482,7 +491,6 @@ body {
   margin: 0 20px;
   display: none;
 }
-
 .title {
   font-size: 24px;
   font-weight: bold;
@@ -490,12 +498,10 @@ body {
   margin: 0;
   flex-grow: 1;
 }
-
 .search-container {
   display: flex;
   align-items: center;
 }
-
 .search-input {
   flex-grow: 1;
   padding: 8px 12px;
@@ -503,7 +509,6 @@ body {
   border-radius: 4px;
   font-size: 14px;
 }
-
 .add-button {
   background-color: var(--secondary-color);
   color: white;
@@ -517,7 +522,6 @@ body {
   margin-left: 10px;
   transition: background-color 0.3s;
 }
-
 .add-button:hover {
   background-color: var(--secondary-hover);
 }
@@ -525,7 +529,6 @@ body {
 .add-button svg {
   margin-right: 5px;
 }
-
 .machinery-table {
   width: auto;
   max-width: 1px;
@@ -534,7 +537,7 @@ body {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin: 0 auto;
+  margin: 0 auto; /* Centra la tabla */
 }
 
 .machinery-table th,
@@ -558,25 +561,16 @@ body {
   display: flex;
   gap: 8px;
 }
-
 .edit-button,
 .delete-button {
   background: none;
   border: none;
   cursor: pointer;
   padding: 4px;
-  transition: opacity 0.3s;
 }
-
-.edit-button:hover,
-.delete-button:hover {
-  opacity: 0.7;
-}
-
 .edit-button svg {
   color: var(--primary-color);
 }
-
 .delete-button svg {
   color: var(--secondary-color);
 }
@@ -598,22 +592,27 @@ body {
   border-radius: 4px;
 }
 
+.submit-button,
+.cancel-button {
+  width: 48%;
+  margin: 0;
+}
 .submit-button {
   background-color: var(--primary-color);
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  font-size: 16px;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 18px;
   cursor: pointer;
-  width: 100%;
-  transition: background-color 0.3s;
+  font-weight: bold;
+  transition: background-color 0.3s, transform 0.2s;
 }
 
 .submit-button:hover {
   background-color: var(--primary-hover);
+  transform: scale(1.02);
 }
-
 .dialog {
   position: fixed;
   top: 0;
@@ -626,7 +625,6 @@ body {
   justify-content: center;
   z-index: 1;
 }
-
 .dialog-content {
   width: 90%;
   max-width: 600px;
@@ -637,7 +635,6 @@ body {
   overflow-y: auto;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
-
 h2#dialogTitle {
   font-size: 26px;
   margin-bottom: 20px;
@@ -650,7 +647,6 @@ h2#dialogTitle {
 .form-group {
   margin-bottom: 20px;
 }
-
 .form-group label {
   display: block;
   margin-bottom: 5px;
@@ -658,7 +654,6 @@ h2#dialogTitle {
   font-size: 15px;
   color: var(--text-color);
 }
-
 .form-group input,
 .form-group select {
   width: 100%;
@@ -669,14 +664,12 @@ h2#dialogTitle {
   background-color: #f9f9f9;
   transition: border-color 0.3s, background-color 0.3s;
 }
-
 .form-group input:focus,
 .form-group select:focus {
   border-color: var(--primary-color);
   background-color: #ffffff;
   outline: none;
 }
-
 .submit-button {
   background-color: var(--primary-color);
   color: white;
@@ -689,16 +682,13 @@ h2#dialogTitle {
   font-weight: bold;
   transition: background-color 0.3s, transform 0.2s;
 }
-
 .submit-button:hover {
   background-color: var(--primary-hover);
   transform: scale(1.02);
 }
-
 .submit-button:active {
   transform: scale(0.98);
 }
-
 .dialog {
   position: fixed;
   top: 0;
@@ -711,7 +701,6 @@ h2#dialogTitle {
   justify-content: center;
   z-index: 1;
 }
-
 .dialog-content {
   width: 80%;
   max-width: 400px;
@@ -723,7 +712,6 @@ h2#dialogTitle {
   max-height: 800px;
   overflow-y: auto;
 }
-
 .dialog-content h2 {
   margin-bottom: 10px;
   color: #ff3333;
@@ -736,12 +724,10 @@ h2#dialogTitle {
 .dialog-content p {
   margin-bottom: 20px;
 }
-
 .confirm-buttons {
   display: flex;
   justify-content: space-around;
 }
-
 .confirm-button {
   background-color: #ff3333;
   color: white;
@@ -751,7 +737,6 @@ h2#dialogTitle {
   cursor: pointer;
   font-size: 16px;
 }
-
 .cancel-button {
   background-color: #f50909;
   color: #ffffff;
@@ -760,17 +745,35 @@ h2#dialogTitle {
   border-radius: 6px;
   font-size: 18px;
   cursor: pointer;
-  width: 100%;
   font-weight: bold;
   transition: background-color 0.3s, transform 0.2s;
 }
-
 .cancel-button:hover {
-  background-color: #aaa;
+  background-color: #d40808;
   transform: scale(1.02);
 }
-
 .cancel-button:active {
   transform: scale(0.98);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group .form-input {
+  width: 100%;
+}
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
 }
 </style>

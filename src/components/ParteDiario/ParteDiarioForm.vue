@@ -44,7 +44,7 @@
                 :options="maquinariasAllOptions"
                 option-value="idMaquinaria"
                 option-label="placa"
-                label = "Placa de la maquina"
+                label="Placa de la maquina"
                 use-input
                 @filter="filterMaquinarias"
                 :rules="[(val) => !!val || 'Campo requerido']"
@@ -75,8 +75,8 @@
                 filled
                 v-model="idOperadorSeleccionado"
                 :options="operadoresAllOptions"
-                option-value = "idPersonal"
-                option-label = "nombre"
+                option-value="idPersonal"
+                option-label="nombre"
                 label="Operador"
                 use-input
                 @filter="filterOperadores"
@@ -133,7 +133,7 @@
             <div class="col-12 col-md-4">
               <q-input
                 filled
-                v-model="parteDiario.aceiteHidraulico"
+                v-model="parteDiario.aceite"
                 label="Aceite Hidráulico (L)"
                 type="number"
               />
@@ -149,66 +149,11 @@
           </div>
 
           <q-checkbox
-            v-model="parteDiario.firmado"
+            v-model="parteDiario.firmas"
             label="Firmado por el operador y el cliente"
           />
 
           <q-separator class="q-my-md" />
-
-          <div class="text-h6 text-secondary q-mb-md">
-            Detalles del Parte Diario
-          </div>
-
-          <q-list bordered separator>
-            <q-item
-              v-for="(detalle, index) in parteDiario.detalles"
-              :key="index"
-            >
-              <q-item-section>
-                <q-input
-                  filled
-                  v-model="detalle.horas"
-                  type="number"
-                  label="Horas"
-                  :rules="[(val) => !!val || 'Campo requerido']"
-                />
-              </q-item-section>
-              <q-item-section>
-                <q-input
-                  filled
-                  v-model="detalle.trabajoEfectuado"
-                  label="Trabajo Efectuado"
-                  :rules="[(val) => !!val || 'Campo requerido']"
-                />
-              </q-item-section>
-              <q-item-section>
-                <q-input
-                  filled
-                  v-model="detalle.descripcion"
-                  type="textarea"
-                  label="Descripción"
-                  :rules="[(val) => !!val || 'Campo requerido']"
-                />
-              </q-item-section>
-              <q-item-section side>
-                <q-btn
-                  flat
-                  round
-                  color="negative"
-                  icon="delete"
-                  @click="eliminarDetalle(index)"
-                />
-              </q-item-section>
-            </q-item>
-          </q-list>
-
-          <q-btn
-            label="Agregar Detalle"
-            icon="add"
-            color="secondary"
-            @click="agregarDetalle"
-            class="q-mt-sm"
-          />
 
           <q-btn
             label="Guardar Parte Diario"
@@ -220,84 +165,69 @@
       </q-card-section>
     </q-card>
 
+    <!-- Lista de Partes Diarios Registrados -->
     <q-card class="activities-card">
       <q-card-section>
         <div class="text-h6 text-secondary">Partes Diarios Registrados</div>
       </q-card-section>
-
       <q-card-section>
-        <q-list v-if="partesDiarios.length > 0" bordered separator>
+        <div v-for="parte in partesDiarios" :key="parte.id" class="q-mb-md">
           <q-expansion-item
-            v-for="parte in partesDiarios"
-            :key="parte.id"
-            :label="`${parte.fecha} - ${parte.cliente}`"
+            :label="
+              'Parte Diario del ' + new Date(parte.fecha).toLocaleDateString()
+            "
             header-class="text-primary"
           >
             <q-card>
               <q-card-section>
                 <div class="row q-col-gutter-md">
                   <div class="col-12 col-md-6">
+                    <p><strong>Cliente:</strong> {{ parte.idCliente }}</p>
                     <p>
-                      <strong>Placa de la Máquina:</strong>
-                      {{ parte.placaMaquina }}
+                      <strong>Placa Máquina:</strong> {{ parte.idMaquinaria }}
                     </p>
-                    <p><strong>Operador:</strong> {{ parte.operador }}</p>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <p><strong>Operador:</strong> {{ parte.idPersonal }}</p>
                     <p>
                       <strong>Lugar de Trabajo:</strong>
                       {{ parte.lugarTrabajo }}
                     </p>
+                  </div>
+                  <div class="col-12 col-md-6">
                     <p>
-                      <strong>Horómetro Inicio:</strong>
+                      <strong>Horometro Inicial:</strong>
                       {{ parte.horometroInicio }}
                     </p>
                     <p>
-                      <strong>Horómetro Final:</strong>
+                      <strong>Horometro Final:</strong>
                       {{ parte.horometroFinal }}
                     </p>
                   </div>
                   <div class="col-12 col-md-6">
-                    <p><strong>Petróleo:</strong> {{ parte.petroleo }} L</p>
+                    <p><strong>Petróleo:</strong> {{ parte.petroleo }}</p>
+                    <p><strong>Aceite:</strong> {{ parte.aceite }}</p>
                     <p>
-                      <strong>Aceite Hidráulico:</strong>
-                      {{ parte.aceiteHidraulico }} L
-                    </p>
-                    <p>
-                      <strong>Próximo Mantenimiento:</strong>
-                      {{ parte.proximoMantenimiento }}
-                    </p>
-                    <p>
-                      <strong>Firmado:</strong>
-                      {{ parte.firmado ? "Sí" : "No" }}
+                      <strong>Proximo Mantenimiento:</strong>
+                      {{
+                        new Date(
+                          parte.proximoMantenimiento
+                        ).toLocaleDateString()
+                      }}
                     </p>
                   </div>
                 </div>
-                <q-separator class="q-my-md" />
-                <div class="text-h6 text-secondary q-mb-md">
-                  Detalles del Parte Diario
-                </div>
-                <q-list bordered separator>
-                  <q-item
-                    v-for="(detalle, index) in parte.detalles"
-                    :key="index"
-                  >
-                    <q-item-section>
-                      <p><strong>Horas:</strong> {{ detalle.horas }}</p>
-                      <p>
-                        <strong>Trabajo Efectuado:</strong>
-                        {{ detalle.trabajoEfectuado }}
-                      </p>
-                      <p>
-                        <strong>Descripción:</strong> {{ detalle.descripcion }}
-                      </p>
-                    </q-item-section>
-                  </q-item>
-                </q-list>
               </q-card-section>
+              <!-- Botón para agregar detalles -->
+              <q-card-actions align="right">
+                <q-btn
+                  label="Agregar Detalles"
+                  color="primary"
+                  @click="agregarDetalles(parte.id)"
+                />
+              </q-card-actions>
             </q-card>
           </q-expansion-item>
-        </q-list>
-        <div v-else class="text-center q-pa-md">
-          No hay partes diarios registrados.
         </div>
       </q-card-section>
     </q-card>
@@ -305,26 +235,23 @@
 </template>
 
 <script>
-import axios from "axios";
-
 export default {
   data() {
     return {
       partesDiarios: [],
       parteDiario: {
-        cliente: null,
-        placaMaquina: null,
-        operador: null,
         serie: null,
         fecha: "",
+        firmas: false,
         horometroInicio: "",
         horometroFinal: "",
+        idCliente: null,
+        idPersonal: null,
+        idMaquinaria: null,
         lugarTrabajo: "",
         petroleo: "",
-        aceiteHidraulico: "",
+        aceite: "",
         proximoMantenimiento: "",
-        firmado: false,
-        detalles: [],
       },
       clientesOptions: [],
       clientesAllOptions: [],
@@ -345,7 +272,7 @@ export default {
         //console.log(response);
         this.clientesOptions = response.data.map((cliente) => cliente.nombre);
         this.clientesAllOptions = response.data;
-       /*  console.log("Clientes: " + JSON.stringify(this.clientesAllOptions));
+        /*  console.log("Clientes: " + JSON.stringify(this.clientesAllOptions));
         console.log(
           "Cliente seleccionado: " + JSON.stringify(this.idClienteSeleccionado)
         ); */
@@ -353,7 +280,18 @@ export default {
         console.error("Error al obtener los clientes:", error);
       }
     },
-
+    async partesDiariosGet() {
+      try {
+        const response = await this.$api.get("/api/ParteDiarios");
+        this.partesDiarios = response.data;
+        /*  console.log("Clientes: " + JSON.stringify(this.clientesAllOptions));
+        console.log(
+          "Cliente seleccionado: " + JSON.stringify(this.idClienteSeleccionado)
+        ); */
+      } catch (error) {
+        console.error("Error al obtener los clientes:", error);
+      }
+    },
     // Función para obtener las maquinarias desde la API
     async fetchMaquinarias() {
       try {
@@ -369,7 +307,9 @@ export default {
     async fetchOperadores() {
       try {
         const response = await this.$api.get("/api/Personal/GetOperadores");
-        this.operadoresOptions = response.data.map((personal) => personal.nombre);
+        this.operadoresOptions = response.data.map(
+          (personal) => personal.nombre
+        );
         this.operadoresAllOptions = response.data;
       } catch (error) {
         console.error("Error al obtener los operadores:", error);
@@ -427,92 +367,56 @@ export default {
       });
     },
 
-    // Función para agregar detalles al parte diario
-    agregarDetalle() {
-      this.parteDiario.detalles.push({
-        horas: "",
-        trabajoEfectuado: "",
-        descripcion: "",
-      });
-    },
-
-    // Función para eliminar detalles del parte diario
-    eliminarDetalle(index) {
-      this.parteDiario.detalles.splice(index, 1);
-    },
-
     // Función para guardar el parte diario
     guardarParteDiario() {
       //console.log(this.idOperadorSeleccionado.idPersonal)
-      this.parteDiario.cliente = this.idClienteSeleccionado.idCliente
-      this.parteDiario.placaMaquina = this.idMaquinariaSeleccionado.idMaquinaria
-      this.parteDiario.operador = this.idOperadorSeleccionado.idPersonal
-      console.log(this.parteDiario)
-      return;
-      if (this.parteDiario.cliente && this.parteDiario.fecha) {
-        this.partesDiarios.push({
-          id: Date.now(),
-          ...this.parteDiario,
-        });
-        this.parteDiario = {
-          cliente: "",
-          placaMaquina: "",
-          fecha: "",
-          operador: "",
-          horometroInicio: "",
-          horometroFinal: "",
-          lugarTrabajo: "",
-          petroleo: "",
-          aceiteHidraulico: "",
-          proximoMantenimiento: "",
-          firmado: false,
-          detalles: [],
-        };
-      }
-      /*
-    // Función para guardar el parte diario
-    guardarParteDiario() {
-      //console.log("entro");
-      //console.log(this.idCliente);
-      //console.log(this.idMaquinaria);
-      //console.log(this.idOperador);
-      //console.log("para el post");
-      //console.log(this.parteDiario);
+      this.parteDiario.idCliente = this.idClienteSeleccionado.idCliente;
+      this.parteDiario.idMaquinaria =
+        this.idMaquinariaSeleccionado.idMaquinaria;
+      this.parteDiario.idPersonal = this.idOperadorSeleccionado.idPersonal;
+      //console.log(this.parteDiario)
+      console.log(this.partesDiarios);
 
-      if (this.parteDiario.cliente && this.parteDiario.fecha) {
-        // Primero, se realiza la solicitud POST para guardar en la base de datos
-        this.$api
-          .post("/api/ParteDiario", this.parteDiario) // Suponiendo que el endpoint es /api/ParteDiarios
-          .then((response) => {
-            console.log("Parte Diario guardado con éxito:", response.data);
-
-            // Si la parte se guarda correctamente, se agrega a la lista local
-            this.partesDiarios.push({
-              id: response.data.id, // Suponiendo que la respuesta tiene el id asignado
-              ...this.parteDiario,
-            });
-
-            // Limpiar el formulario después de guardar
-            this.parteDiario = {
-              cliente: null,
-              placaMaquina: null,
-              operador: null,
-              serie: null,
-              fecha: "",
-              horometroInicio: "",
-              horometroFinal: "",
-              lugarTrabajo: "",
-              petroleo: "",
-              aceiteHidraulico: "",
-              proximoMantenimiento: "",
-              firmado: false,
-              detalles: [],
-            };
-          })
-          .catch((error) => {
-            console.error("Error al guardar el parte diario:", error);
+      const endpointURL = "/api/ParteDiarios";
+      this.$api
+        .post(endpointURL, this.parteDiario)
+        .then((response) => {
+          this.$q.notify({
+            message: "Registro exitoso",
+            color: "positive",
+            timeout: 3000,
+            position: "top",
           });
-      } */
+          this.partesDiarios.push(response.data);
+          this.$router.push("/parteDiario");
+        })
+        .catch((error) => {
+          //console.log("Esto es error");
+          this.$q.notify({
+            message: "Registro no válido",
+            color: "negative",
+            timeout: 3000,
+            position: "bottom",
+          });
+        });
+
+      return;
+    },
+    agregarDetalles() {
+      // Obtener el último parte diario agregado
+      const ultimoParte = this.partesDiarios[this.partesDiarios.length - 1];
+
+      if (!ultimoParte) {
+        this.$q.notify({
+          message: "No hay partes diarios disponibles.",
+          color: "negative",
+          timeout: 3000,
+          position: "top",
+        });
+        return;
+      }
+
+      console.log("Último Parte Diario seleccionado:", ultimoParte);
     },
   },
 
@@ -521,6 +425,7 @@ export default {
     this.fetchClientes();
     this.fetchMaquinarias();
     this.fetchOperadores();
+    this.partesDiariosGet();
   },
 };
 </script>
