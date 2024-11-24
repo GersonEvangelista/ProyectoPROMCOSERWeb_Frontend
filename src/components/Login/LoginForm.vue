@@ -222,15 +222,15 @@ export default {
       this.$api
         .post(endpointURL, user)
         .then((response) => {
-          //localStorage.setItem("userData",JSON.stringify(response.data.token))
-          //console.log("Respuesta del servidor:", response.data);
+          localStorage.setItem("userData",JSON.stringify(response.data))
+          console.log("Respuesta del servidor:", response.data);
           this.$q.notify({
             message: "Inicio exitoso",
             color: "positive",
             timeout: 3000,
             position: "top",
           });
-          if (response.data == 1) {
+          if (response.data.idRol == 1) {
             this.$router.push("/main");
           } else {
             this.$router.push("/mainOperador");
