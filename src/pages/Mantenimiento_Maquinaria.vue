@@ -158,6 +158,26 @@
           </tr>
         </tbody>
       </table>
+
+      <!-- Diálogo de confirmación para eliminar -->
+      <div
+        v-if="isConfirmDialogVisible"
+        class="dialog"
+        @click.self="closeConfirmDialog"
+      >
+        <div class="dialog-content">
+          <h2>Confirmación</h2>
+          <p>¿Estás seguro de que deseas eliminar esta maquinaria?</p>
+          <div class="confirm-buttons">
+            <button @click="confirmDelete" class="confirm-button">
+              Sí, eliminar
+            </button>
+            <button @click="closeConfirmDialog" class="cancel-button">
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
     </main>
 
     <!-- Dialogo para agregar/editar maquinaria -->
@@ -221,7 +241,7 @@
                 required
               />
             </div>
-            <div class="form-group">
+            <div class="form-group" v-if="isEditing">
               <label>Estado</label>
               <select v-model="form.estado" class="form-input" required>
                 <option :value="true">Activo</option>
@@ -270,6 +290,8 @@ export default {
         horometroActual: null,
         estado: true,
       },
+      isConfirmDialogVisible: false, // Controla la visibilidad del diálogo
+      machineryToDelete: null, // Almacena la maquinaria seleccionada para eliminar
     };
   },
   computed: {
@@ -302,6 +324,17 @@ export default {
     },
   },
   methods: {
+    confirmDelete() {
+      if (this.machineryToDelete) {
+        this.deleteMachine(this.machineryToDelete); // Llama a la función de eliminación
+        this.closeConfirmDialog(); // Cierra el cuadro de confirmación
+      }
+    },
+    closeConfirmDialog() {
+      this.isConfirmDialogVisible = false; // Oculta el cuadro de confirmación
+      this.machineryToDelete = null; // Limpia el ID de la maquinaria
+    },
+
     showDialog(machine = null) {
       this.isEditing = !!machine;
       this.dialogTitle = machine
@@ -342,9 +375,16 @@ export default {
             const index = this.machinery.findIndex(
               (m) => m.idMaquinaria === this.form.idMaquinaria
             );
+
             this.machinery.splice(index, 1, { ...this.form });
-            alert("Maquinaria actualizada exitosamente.");
+            //alert("Maquinaria actualizada exitosamente.");
             this.hideDialog();
+            this.$q.notify({
+              message: "Actualización exitoso",
+              color: "positive",
+              timeout: 3000,
+              position: "top",
+            });
           })
           .catch((error) => {
             const errorMessage =
@@ -359,9 +399,15 @@ export default {
           .post("/api/Maquinaria", maquinariaData)
           .then((response) => {
             this.machinery.push(response.data);
-            alert("Maquinaria agregada exitosamente.");
+            //alert("Maquinaria agregada exitosamente.");
             this.hideDialog();
             this.fetchMachineryData();
+            this.$q.notify({
+              message: "Registro exitoso",
+              color: "positive",
+              timeout: 3000,
+              position: "top",
+            });
           })
           .catch((error) => {
             const errorMessage =
@@ -374,12 +420,8 @@ export default {
     },
 
     confirmDeleteMachine(id) {
-      const confirmed = confirm(
-        "¿Estás seguro de que desea eliminar esta maquinaria?"
-      );
-      if (confirmed) {
-        this.deleteMachine(id);
-      }
+      this.machineryToDelete = id; // Almacena el ID de la maquinaria a eliminar
+      this.isConfirmDialogVisible = true; // Muestra el diálogo
     },
     deleteMachine(id) {
       this.$api
@@ -388,7 +430,13 @@ export default {
           this.machinery = this.machinery.filter(
             (machine) => machine.idMaquinaria !== id
           );
-          alert("Maquinaria eliminada exitosamente.");
+          //alert("Maquinaria eliminada exitosamente.");
+          this.$q.notify({
+            message: "Eliminación exitosa",
+            color: "red",
+            timeout: 3000,
+            position: "top",
+          });
         })
         .catch((error) => {
           console.error("Error al eliminar la maquinaria: ", error);
@@ -748,14 +796,13 @@ h2#dialogTitle {
   font-weight: bold;
   transition: background-color 0.3s, transform 0.2s;
 }
+.confirm-button:hover {
+  background-color: #cc0000;
+}
 .cancel-button:hover {
-  background-color: #d40808;
+  background-color: #aaa;
   transform: scale(1.02);
 }
-.cancel-button:active {
-  transform: scale(0.98);
-}
-
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
