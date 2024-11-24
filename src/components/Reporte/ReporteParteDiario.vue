@@ -286,7 +286,7 @@ export default {
 
     obtenerDetalles(idParteDiario) {
       this.$api
-        .get("/api/DetalleParteDiarios")
+        .get("/api/DetalleParteDiariosConS")
         .then((response) => {
           // Verifica si la respuesta contiene datos en un array
           if (response.data && Array.isArray(response.data)) {

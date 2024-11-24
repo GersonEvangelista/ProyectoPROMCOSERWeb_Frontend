@@ -28,6 +28,30 @@ const routes = [
     ],
   },
   {
+    path: "/mainOperador",
+    component: () => import("layouts/MainLayoutOperador.vue"),
+    children: [
+      { path: "", component: () => import("pages/IndexPage.vue") },
+      {
+        path: "Mantenimiento_Maquinaria",
+        component: () => import("src/pages/Mantenimiento_Maquinaria.vue"),
+      },
+      {
+        path: "cliente",
+        component: () => import("src/components/Cliente/clienteForm.vue"),
+      },
+      {
+        path: "parteDiario",
+        component: () => import("src/components/ParteDiario/ParteDiarioForm.vue"),
+      },
+      {
+        path: "reporteParteDiario",
+        component: () =>
+          import("src/components/Reporte/ReporteParteDiario.vue"),
+      },
+    ],
+  },
+  {
     path: "/",
     component: () => import("components/Login/LoginForm.vue"),
   },

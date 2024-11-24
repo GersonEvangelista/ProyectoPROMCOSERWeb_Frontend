@@ -51,25 +51,25 @@ const linksList = [
     title: "Maquinaria",
     caption: "Gestión de maquinaria",
     icon: "build",
-    route: "/main/Mantenimiento_Maquinaria",
-  },
-  {
-    title: "Personal",
-    caption: "Gestión de personal",
-    icon: "people",
-    route: "/main/personal",
+    route: "/mainOperador/Mantenimiento_Maquinaria",
   },
   {
     title: "Cliente",
     caption: "Gestión de clientes",
     icon: "person",
-    route: "/main/cliente",
+    route: "/mainOperador/cliente",
+  },
+  {
+    title: "Parte Diario",
+    caption: "Registro de parte diario",
+    icon: "book",
+    route: "/mainOperador/parteDiario",
   },
   {
     title: "Reportes",
     caption: "Descripción y historial de parte diario de maquinaria",
     icon: "analytics",
-    route: "/main/reporteParteDiario",
+    route: "/mainOperador/reporteParteDiario",
   },
 ];
 

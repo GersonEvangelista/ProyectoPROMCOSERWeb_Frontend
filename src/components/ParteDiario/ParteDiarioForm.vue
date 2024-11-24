@@ -166,46 +166,54 @@
     </q-card>
 
     <!-- Lista de Partes Diarios Registrados -->
-    <div class="text-h6 text-secondary q-mb-md">
-            Detalles del Parte Diario
-          </div>
+    <div class="text-h6 text-secondary q-mb-md">Detalles del Parte Diario</div>
 
-          <q-list bordered separator>
-              <q-item-section>
-                <q-input
-                  filled
-                  v-model="detalleParteDiario.horas"
-                  type="number"
-                  label="Horas"
-                  :rules="[(val) => !!val || 'Campo requerido']"
-                />
-              </q-item-section>
-              <q-item-section>
-                <q-input
-                  filled
-                  v-model="detalleParteDiario.trabajoEfectuado"
-                  label="Trabajo Efectuado"
-                  :rules="[(val) => !!val || 'Campo requerido']"
-                />
-              </q-item-section>
-              <q-item-section>
-                <q-input
-                  filled
-                  v-model="detalleParteDiario.descripcion"
-                  type="textarea"
-                  label="Descripción"
-                  :rules="[(val) => !!val || 'Campo requerido']"
-                />
-              </q-item-section>
-          </q-list>
+    <q-list bordered separator>
+      <q-item-section>
+        <q-input
+          filled
+          v-model="detalleParteDiario.horas"
+          type="number"
+          label="Horas"
+          :rules="[(val) => !!val || 'Campo requerido']"
+        />
+      </q-item-section>
+      <q-item-section>
+        <q-input
+          filled
+          v-model="detalleParteDiario.trabajoEfectuado"
+          label="Trabajo Efectuado"
+          :rules="[(val) => !!val || 'Campo requerido']"
+        />
+      </q-item-section>
+      <q-item-section>
+        <q-input
+          filled
+          v-model="detalleParteDiario.descripcion"
+          type="textarea"
+          label="Descripción"
+          :rules="[(val) => !!val || 'Campo requerido']"
+        />
+      </q-item-section>
+    </q-list>
 
-          <q-btn
-            label="Agregar Detalle"
-            icon="add"
-            color="secondary"
-            @click="agregarDetalle"
-            class="q-mt-sm"
-          />
+    <q-btn
+      label="Agregar Detalle"
+      icon="add"
+      color="secondary"
+      @click="agregarDetalle"
+      class="q-mt-sm"
+    />
+
+    <q-btn
+      label="Terminar registro parte diario"
+      icon="done_all"
+      color="green-8"
+      text-color="white"
+      unelevated
+      class="full-width q-mt-md"
+      @click="finDeRegistro"
+    />
 
   </q-page>
 </template>
@@ -228,11 +236,11 @@ export default {
         aceite: "",
         proximoMantenimiento: "",
       },
-      detalleParteDiario:{
+      detalleParteDiario: {
         idParteDiario: null,
         horas: null,
-        trabajoEfectuado: '',
-        descripcion: '',
+        trabajoEfectuado: "",
+        descripcion: "",
       },
       clientesOptions: [],
       clientesAllOptions: [],
@@ -296,23 +304,25 @@ export default {
         console.error("Error al obtener los operadores:", error);
       }
     },
-
+/*
     // Filtrar clientes para búsqueda en el dropdown
     filterClientes(val, update) {
       if (val === "") {
         update(() => {
-          this.clientesOptions = this.clientesOptions;
+          this.clientesAllOptions = this.clientesAllOptions;
         });
         return;
       }
 
       update(() => {
         const needle = val.toLowerCase();
-        this.clientesOptions = this.clientesOptions.filter(
+        this.clientesAllOptions = this.clientesAllOptions.filter(
           (v) => v.toLowerCase().indexOf(needle) > -1
         );
       });
     },
+*/
+
 
     // Filtrar maquinarias para búsqueda en el dropdown
     filterMaquinarias(val, update) {
@@ -348,33 +358,13 @@ export default {
       });
     },
 
-     // Función para agregar detalles al parte diario
-     async agregarDetalle() {
-        try {
-          // Lógica que podría causar errores
-        // Obtener el último parte diario agregado
-        const ultimoParte = this.partesDiarios[this.partesDiarios.length - 1];
+    // Función para agregar detalles al parte diario
+    async agregarDetalle() {
+      try {
 
-        if (!ultimoParte) {
-          this.$q.notify({
-            message: "No hay partes diarios disponibles.",
-            color: "negative",
-            timeout: 3000,
-            position: "top",
-          });
-          return;
-        }
+        //console.log("ID PARTE DIARIO: "+this.detalleParteDiario.idParteDiario)
 
-        console.log("Último Parte Diario seleccionado:", ultimoParte.idParteDiario);
-        console.log("Detalle agregado correctamente. "+ this.detalleParteDiario.horas+
-        "/"+this.detalleParteDiario.trabajoEfectuado+"/"+this.detalleParteDiario.descripcion+
-          "/");
-
-        this.detalleParteDiario.idParteDiario = ultimoParte.idParteDiario;
-
-        console.log(this.detalleParteDiario)
-
-        const endpointURL = "/api/DetalleParteDiarios";
+        const endpointURL = "/api/DetalleParteDiario";
         this.$api
           .post(endpointURL, this.detalleParteDiario)
           .then((response) => {
@@ -385,6 +375,9 @@ export default {
               position: "top",
             });
             this.partesDiarios.push(response.data);
+            this.detalleParteDiario.horas = 1;
+            this.detalleParteDiario.trabajoEfectuado = " ";
+            this.detalleParteDiario.descripcion = " ";
           })
           .catch((error) => {
             //console.log("Esto es error");
@@ -397,11 +390,14 @@ export default {
           });
 
         return;
+      } catch (error) {
+        console.error("Error al agregar el detalle:", error);
+      }
+    },
 
-        } catch (error) {
-            console.error("Error al agregar el detalle:", error);
-        }
-      },
+    finDeRegistro() {
+      window.location.reload();
+    },
 
     // Función para guardar el parte diario
     guardarParteDiario() {
@@ -410,10 +406,8 @@ export default {
       this.parteDiario.idMaquinaria =
         this.idMaquinariaSeleccionado.idMaquinaria;
       this.parteDiario.idPersonal = this.idOperadorSeleccionado.idPersonal;
-      //console.log(this.parteDiario)
-      console.log(this.partesDiarios);
 
-      const endpointURL = "/api/ParteDiarios";
+      const endpointURL = "/api/ParteDiario/getIdparaPostDetalles";
       this.$api
         .post(endpointURL, this.parteDiario)
         .then((response) => {
@@ -423,8 +417,10 @@ export default {
             timeout: 3000,
             position: "top",
           });
+          this.detalleParteDiario.idParteDiario = response.data
+          //console.log(this.detalleParteDiario.idParteDiario)
           this.partesDiarios.push(response.data);
-          this.$router.push("/parteDiario");
+          this.$router.push("/mainOperador/parteDiario");
         })
         .catch((error) => {
           //console.log("Esto es error");
@@ -438,24 +434,7 @@ export default {
 
       return;
     },
-  /*   agregarDetalles() {
-      // Obtener el último parte diario agregado
-      const ultimoParte = this.partesDiarios[this.partesDiarios.length - 1];
 
-      if (!ultimoParte) {
-        this.$q.notify({
-          message: "No hay partes diarios disponibles.",
-          color: "negative",
-          timeout: 3000,
-          position: "top",
-        });
-        return;
-      }
-
-      console.log("Último Parte Diario seleccionado:", ultimoParte);
-
-
-    }, */
   },
 
   mounted() {
@@ -468,160 +447,6 @@ export default {
 };
 </script>
 
-<!--
-<script setup>
-import { ref, onMounted } from "vue";
-
-// Refs para almacenar los datos de las partes diarias y el detalle del parte diario
-const partesDiarios = ref([]);
-const parteDiario = ref({
-  cliente: "",
-  placaMaquina: "",
-  fecha: "",
-  operador: "",
-  horometroInicio: "",
-  horometroFinal: "",
-  lugarTrabajo: "",
-  petroleo: "",
-  aceiteHidraulico: "",
-  proximoMantenimiento: "",
-  firmado: false,
-  detalles: [],
-});
-
-// Refs para almacenar las opciones de los dropdowns
-const clientesOptions = ref([]);
-const maquinariasOptions = ref([]);
-const operadoresOptions = ref([]);
-
-// Función para obtener los clientes desde la API
-const fetchClientes = async () => {
-  console.log('Haciendo solicitud para obtener los clientes...')
-  try {
-    const response = await axios.get("/api/Clientes");
-    clientesOptions.value = response.data.map((cliente) => cliente.nombre);
-  } catch (error) {
-    console.error("Error al obtener los clientes:", error);
-  }
-};
-
-// Función para obtener las maquinarias desde la API
-const fetchMaquinarias = async () => {
-  try {
-    const response = await axios.get("/api/Maquinaria");
-    maquinariasOptions.value = response.data.map((maquina) => maquina.placa);
-  } catch (error) {
-    console.error("Error al obtener las maquinarias:", error);
-  }
-};
-
-// Función para obtener los operadores desde la API
-const fetchOperadores = async () => {
-  try {
-    const response = await axios.get("/api/Operadores");
-    operadoresOptions.value = response.data.map((operador) => operador.nombre);
-  } catch (error) {
-    console.error("Error al obtener los operadores:", error);
-  }
-};
-
-// Filtrar clientes para búsqueda en el dropdown
-const filterClientes = (val, update) => {
-  if (val === "") {
-    update(() => {
-      clientesOptions.value = clientesOptions.value;
-    });
-    return;
-  }
-
-  update(() => {
-    const needle = val.toLowerCase();
-    clientesOptions.value = clientesOptions.value.filter(
-      (v) => v.toLowerCase().indexOf(needle) > -1
-    );
-  });
-};
-
-// Filtrar maquinarias para búsqueda en el dropdown
-const filterMaquinarias = (val, update) => {
-  if (val === "") {
-    update(() => {
-      maquinariasOptions.value = maquinariasOptions.value;
-    });
-    return;
-  }
-
-  update(() => {
-    const needle = val.toLowerCase();
-    maquinariasOptions.value = maquinariasOptions.value.filter(
-      (v) => v.toLowerCase().indexOf(needle) > -1
-    );
-  });
-};
-
-// Filtrar operadores para búsqueda en el dropdown
-const filterOperadores = (val, update) => {
-  if (val === "") {
-    update(() => {
-      operadoresOptions.value = operadoresOptions.value;
-    });
-    return;
-  }
-
-  update(() => {
-    const needle = val.toLowerCase();
-    operadoresOptions.value = operadoresOptions.value.filter(
-      (v) => v.toLowerCase().indexOf(needle) > -1
-    );
-  });
-};
-
-// Función para agregar detalles al parte diario
-const agregarDetalle = () => {
-  parteDiario.value.detalles.push({
-    horas: "",
-    trabajoEfectuado: "",
-    descripcion: "",
-  });
-};
-
-// Función para eliminar detalles del parte diario
-const eliminarDetalle = (index) => {
-  parteDiario.value.detalles.splice(index, 1);
-};
-
-// Función para guardar el parte diario
-const guardarParteDiario = () => {
-  if (parteDiario.value.cliente && parteDiario.value.fecha) {
-    partesDiarios.value.push({
-      id: Date.now(),
-      ...parteDiario.value,
-    });
-    parteDiario.value = {
-      cliente: "",
-      placaMaquina: "",
-      fecha: "",
-      operador: "",
-      horometroInicio: "",
-      horometroFinal: "",
-      lugarTrabajo: "",
-      petroleo: "",
-      aceiteHidraulico: "",
-      proximoMantenimiento: "",
-      firmado: false,
-      detalles: [],
-    };
-  }
-};
-
-// Llamar a las funciones para cargar los datos al montar el componente
-onMounted(() => {
-  fetchClientes();
-  fetchMaquinarias();
-  fetchOperadores();
-});
-</script>
--->
 <style lang="scss">
 .parte-diario-page {
   max-width: 1200px;
