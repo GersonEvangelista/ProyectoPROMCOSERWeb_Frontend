@@ -10,7 +10,9 @@
           />
         </div>
         <div class="header-divider"></div>
-        <h1 class="title">Gestión de Partes Diarios</h1>
+        <h1 class="title">
+          <h1 class="title">Registro Histórico de Partes Diarios</h1>
+        </h1>
       </header>
 
       <main>
@@ -181,7 +183,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="parte in filteredPartes" :key="parte.idParteDiario">
+            <tr v-for="parte in partes" :key="parte.idParteDiario">
               <td>{{ parte.idParteDiario }}</td>
               <td>{{ parte.serie }}</td>
               <td>{{ new Date(parte.fecha).toLocaleDateString() }}</td>
@@ -239,19 +241,29 @@ export default {
   computed: {
     filteredPartes() {
       return this.partes.filter((parte) => {
-        const searchMatch = parte.serie
-          ?.toLowerCase()
-          .includes(this.filters.serie.toLowerCase());
-        const filtersMatch = Object.keys(this.filters).every((key) => {
-          return (
-            parte[key]
-              ?.toString()
-              .toLowerCase()
-              .includes(this.filters[key].toLowerCase()) ||
-            this.filters[key] === ""
-          );
+        return Object.keys(this.filters).every((key) => {
+          const filterValue = this.filters[key]?.toString().toLowerCase();
+          const parteValue = parte[key]?.toString().toLowerCase();
+
+          if (!filterValue) {
+            return true; // Si el filtro está vacío, no afecta
+          }
+
+          // Para valores numéricos
+          if (!isNaN(parte[key]) && !isNaN(this.filters[key])) {
+            return parte[key].toString().startsWith(filterValue);
+          }
+
+          // Para fechas
+          if (key === "fecha" || key === "proximoMantenimiento") {
+            return new Date(parte[key])
+              .toLocaleDateString()
+              .includes(filterValue);
+          }
+
+          // Para texto
+          return parteValue.includes(filterValue);
         });
-        return searchMatch && filtersMatch;
       });
     },
   },
@@ -271,6 +283,7 @@ export default {
           console.error("Error al obtener los partes:", error);
         });
     },
+
     obtenerDetalles(idParteDiario) {
       this.$api
         .get("/api/DetalleParteDiarios")
@@ -302,7 +315,6 @@ export default {
           console.error("Error al obtener los detalles:", error);
         });
     },
-
     mostrarDetalle(parte) {
       // Llama a obtenerDetalles pasando el ID del parte seleccionado
       this.obtenerDetalles(parte.idParteDiario);
@@ -421,11 +433,11 @@ body {
 }
 
 .title {
-  font-size: 28px; /* Ajusta el tamaño si es necesario */
+  font-size: 28px;
   font-weight: bold;
   color: var(--primary-color);
-  margin: 0 auto; /* Centra horizontalmente */
-  text-align: center; /* Centra el texto */
+  text-align: center; /* Centrar horizontalmente */
+  margin: 20px 0; /* Espaciado superior e inferior */
 }
 
 .search-container {
