@@ -232,7 +232,7 @@ export default {
             timeout: 3000,
             position: "top",
           });
-          this.$router.push("/parteDiario");
+          this.$router.push("/main");
         })
         .catch((error) => {
           //console.log("Esto es error", user);
