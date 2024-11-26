@@ -19,7 +19,7 @@
             class="search-input"
             @input="applyFilters"
           />
-          <button @click="showDialog()" class="add-button">
+          <button @click="showAddDialog()" class="add-button">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -46,7 +46,6 @@
       <table class="personal-table">
         <thead>
           <tr>
-            <th>ID</th>
             <th>Nombre</th>
             <th>Apellido</th>
             <th>Rol</th>
@@ -58,13 +57,6 @@
             <th>Acciones</th>
           </tr>
           <tr>
-            <th>
-              <input
-                v-model="filters.idPersonal"
-                @input="applyFilters"
-                placeholder="Filtrar ID..."
-              />
-            </th>
             <th>
               <input
                 v-model="filters.nombre"
@@ -127,7 +119,6 @@
         </thead>
         <tbody>
           <tr v-for="person in filteredPersonal" :key="person.idPersonal">
-            <td>{{ person.idPersonal }}</td>
             <td>{{ person.nombre }}</td>
             <td>{{ person.apellido }}</td>
             <td>{{ getRoleName(person.idRol) }}</td>
@@ -137,7 +128,7 @@
             <td>{{ person.estado ? "Activo" : "Inactivo" }}</td>
             <td>{{ formatDate(person.fechNacimiento) }}</td>
             <td>
-              <button @click="showDialog(person)" class="edit-button">
+              <button @click="showEditDialog(person)" class="edit-button">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -186,16 +177,16 @@
       </table>
     </main>
 
-    <!-- Dialog for Add/Edit Personal -->
-    <div v-if="isDialogVisible" class="dialog">
+    <!-- Dialog for Add Personal -->
+    <div v-if="isAddDialogVisible" class="dialog">
       <div class="dialog-content">
-        <h2>{{ dialogTitle }}</h2>
-        <form @submit.prevent="submitForm" class="form-grid">
+        <h2>Agregar Nuevo Personal</h2>
+        <form @submit.prevent="submitAddForm" class="form-grid">
           <div class="form-group">
             <label for="nombre">Nombre</label>
             <input
               type="text"
-              v-model="form.nombre"
+              v-model="addForm.nombre"
               required
               class="form-input"
             />
@@ -204,14 +195,14 @@
             <label for="apellido">Apellido</label>
             <input
               type="text"
-              v-model="form.apellido"
+              v-model="addForm.apellido"
               required
               class="form-input"
             />
           </div>
           <div class="form-group">
             <label for="idRol">Rol</label>
-            <select v-model="form.idRol" required class="form-input">
+            <select v-model="addForm.idRol" required class="form-input">
               <option value="1">Administrador</option>
               <option value="2">Operario</option>
             </select>
@@ -220,7 +211,7 @@
             <label for="telefono">Teléfono</label>
             <input
               type="text"
-              v-model="form.telefono"
+              v-model="addForm.telefono"
               required
               class="form-input"
             />
@@ -229,27 +220,25 @@
             <label for="correo">Correo</label>
             <input
               type="email"
-              v-model="form.correo"
+              v-model="addForm.correo"
               required
               class="form-input"
             />
           </div>
           <div class="form-group">
             <label for="dni">DNI</label>
-            <input type="text" v-model="form.dni" required class="form-input" />
-          </div>
-          <div class="form-group">
-            <label for="estado">Estado</label>
-            <select v-model="form.estado" required class="form-input">
-              <option :value="true">Activo</option>
-              <option :value="false">Inactivo</option>
-            </select>
+            <input
+              type="text"
+              v-model="addForm.dni"
+              required
+              class="form-input"
+            />
           </div>
           <div class="form-group">
             <label for="fechNacimiento">Fecha de Nacimiento</label>
             <input
               type="date"
-              v-model="form.fechNacimiento"
+              v-model="addForm.fechNacimiento"
               required
               class="form-input"
             />
@@ -258,7 +247,7 @@
             <label for="username">Nombre de Usuario</label>
             <input
               type="text"
-              v-model="form.username"
+              v-model="addForm.username"
               required
               class="form-input"
             />
@@ -267,16 +256,129 @@
             <label for="password">Contraseña</label>
             <input
               type="password"
-              v-model="form.password"
+              v-model="addForm.password"
               required
               class="form-input"
             />
           </div>
           <button type="submit" class="submit-button">Guardar</button>
-          <button type="button" @click="hideDialog" class="cancel-button">
+          <button type="button" @click="hideAddDialog" class="cancel-button">
             Cancelar
           </button>
         </form>
+      </div>
+    </div>
+
+    <!-- Dialog for Edit Personal -->
+    <div v-if="isEditDialogVisible" class="dialog">
+      <div class="dialog-content">
+        <h2>Editar Personal</h2>
+        <form @submit.prevent="submitEditForm" class="form-grid">
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input
+              type="text"
+              v-model="editForm.nombre"
+              required
+              class="form-input"
+            />
+          </div>
+          <div class="form-group">
+            <label for="apellido">Apellido</label>
+            <input
+              type="text"
+              v-model="editForm.apellido"
+              required
+              class="form-input"
+            />
+          </div>
+          <div class="form-group">
+            <label for="idRol">Rol</label>
+            <select v-model="editForm.idRol" required class="form-input">
+              <option value="1">Administrador</option>
+              <option value="2">Operario</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="telefono">Teléfono</label>
+            <input
+              type="text"
+              v-model="editForm.telefono"
+              required
+              class="form-input"
+            />
+          </div>
+          <div class="form-group">
+            <label for="correo">Correo</label>
+            <input
+              type="email"
+              v-model="editForm.correo"
+              required
+              class="form-input"
+            />
+          </div>
+          <div class="form-group">
+            <label for="dni">DNI</label>
+            <input
+              type="text"
+              v-model="editForm.dni"
+              required
+              class="form-input"
+            />
+          </div>
+          <div class="form-group">
+            <label for="estado">Estado</label>
+            <select v-model="editForm.estado" required class="form-input">
+              <option :value="true">Activo</option>
+              <option :value="false">Inactivo</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="fechNacimiento">Fecha de Nacimiento</label>
+            <input
+              type="date"
+              v-model="editForm.fechNacimiento"
+              required
+              class="form-input"
+            />
+          </div>
+          <div class="form-group">
+            <label for="username">Nombre de Usuario</label>
+            <input
+              type="text"
+              v-model="editForm.username"
+              required
+              class="form-input"
+            />
+          </div>
+          <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input
+              type="password"
+              v-model="editForm.password"
+              required
+              class="form-input"
+            />
+          </div>
+          <button type="submit" class="submit-button">Guardar</button>
+          <button type="button" @click="hideEditDialog" class="cancel-button">
+            Cancelar
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div v-if="isDeleteDialogVisible" class="dialog">
+    <div class="dialog-content delete-confirmation">
+      <h2>Confirmación</h2>
+      <p>¿Estás seguro de que deseas eliminar este personal?</p>
+      <div class="confirmation-buttons">
+        <button @click="executeDelete" class="delete-confirm-button">
+          Sí, eliminar
+        </button>
+        <button @click="hideDeleteDialog" class="delete-cancel-button">
+          Cancelar
+        </button>
       </div>
     </div>
   </div>
@@ -286,10 +388,22 @@
 export default {
   data() {
     return {
-      isEditing: false,
       searchTerm: "",
       personal: [],
-      form: {
+      isAddDialogVisible: false,
+      isEditDialogVisible: false,
+      addForm: {
+        nombre: "",
+        apellido: "",
+        idRol: 0,
+        telefono: "",
+        correo: "",
+        dni: "",
+        fechNacimiento: "",
+        username: "",
+        password: "",
+      },
+      editForm: {
         idPersonal: 0,
         nombre: "",
         apellido: "",
@@ -302,10 +416,7 @@ export default {
         username: "",
         password: "",
       },
-      isDialogVisible: false,
-      dialogTitle: "",
       filters: {
-        idPersonal: "",
         nombre: "",
         apellido: "",
         idRol: "",
@@ -315,12 +426,20 @@ export default {
         estado: "",
         fechNacimiento: "",
       },
+      isDeleteDialogVisible: false,
+      personToDeleteId: null,
     };
   },
   computed: {
     filteredPersonal() {
       return this.personal.filter((person) => {
+        const matchesSearch =
+          this.searchTerm === "" ||
+          person.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+          person.apellido.toLowerCase().includes(this.searchTerm.toLowerCase());
+
         return (
+          matchesSearch &&
           Object.keys(this.filters).every((key) => {
             if (!this.filters[key]) return true;
             if (key === "estado") {
@@ -329,18 +448,14 @@ export default {
             if (key === "fechNacimiento") {
               return person[key].startsWith(this.filters[key]);
             }
+            if (key === "idRol") {
+              return Number(person[key]) === Number(this.filters[key]);
+            }
             return person[key]
               .toString()
               .toLowerCase()
               .includes(this.filters[key].toLowerCase());
-          }) &&
-          (this.searchTerm === "" ||
-            Object.values(person).some((value) =>
-              value
-                .toString()
-                .toLowerCase()
-                .includes(this.searchTerm.toLowerCase())
-            ))
+          })
         );
       });
     },
@@ -351,119 +466,137 @@ export default {
       const date = new Date(dateString);
       return date.toLocaleDateString("es-ES");
     },
-    showDialog(person = null) {
-      this.dialogTitle = person ? "Editar Personal" : "Agregar Nuevo Personal";
-      this.isEditing = !!person;
-      if (person) {
-        this.form = { ...person };
-
-        // Llamada a la API para obtener datos adicionales basados en el id
-        this.$api
-          .get(`/api/Personal/${this.form.idPersonal}`)
-          .then((response) => {
-            // Actualiza 'form' con los datos obtenidos
-            this.form = { ...response.data };
-            this.form.fechNacimiento = this.form.fechNacimiento.split("T")[0];
-          })
-          .catch((error) => {
-            console.error("Error al obtener los datos del personal:", error);
-          });
-      } else {
-        this.form = {
-          idPersonal: 0,
-          nombre: "",
-          apellido: "",
-          idRol: 0,
-          telefono: "",
-          correo: "",
-          dni: "",
-          estado: true,
-          fechNacimiento: "",
-          username: "",
-          password: "",
-        };
-      }
-      this.isDialogVisible = true;
+    showAddDialog() {
+      this.isAddDialogVisible = true;
     },
-    hideDialog() {
-      this.isDialogVisible = false;
+    hideAddDialog() {
+      this.isAddDialogVisible = false;
+      this.resetAddForm();
     },
-    submitForm() {
-      // Validate input fields
-      if (!this.validateForm()) {
+    showEditDialog(person) {
+      this.editForm = { ...person };
+      this.editForm.fechNacimiento = this.editForm.fechNacimiento.split("T")[0];
+      this.isEditDialogVisible = true;
+    },
+    hideEditDialog() {
+      this.isEditDialogVisible = false;
+      this.resetEditForm();
+    },
+    resetAddForm() {
+      this.addForm = {
+        nombre: "",
+        apellido: "",
+        idRol: 0,
+        telefono: "",
+        correo: "",
+        dni: "",
+        fechNacimiento: "",
+        username: "",
+        password: "",
+      };
+    },
+    resetEditForm() {
+      this.editForm = {
+        idPersonal: 0,
+        nombre: "",
+        apellido: "",
+        idRol: 0,
+        telefono: "",
+        correo: "",
+        dni: "",
+        estado: true,
+        fechNacimiento: "",
+        username: "",
+        password: "",
+      };
+    },
+    submitAddForm() {
+      if (!this.validateForm(this.addForm)) {
         return;
       }
 
-      const formData = { ...this.form, idUbigeo: 1 };
+      const formData = { ...this.addForm, estado: true, idUbigeo: 1 };
       formData.fechNacimiento = new Date(formData.fechNacimiento).toISOString();
 
-      if (this.isEditing) {
-        // Actualizar personal existente
-        this.$api
-          .put(`/api/Personal/${this.form.idPersonal}`, formData)
-          .then(() => {
-            this.$q.notify({
-              message: "Actualización exitosa",
-              color: "positive",
-              timeout: 3000,
-              position: "top",
-            });
-            const index = this.personal.findIndex(
-              (p) => p.idPersonal === this.form.idPersonal
-            );
-            console.log(formData);
-            this.personal.splice(index, 1, { ...formData });
-            this.hideDialog();
-            setTimeout(() => {
-              this.fetchPersonalData();
-            }, 1000);
-          })
-          .catch((error) => {
-            console.error("Error al actualizar el personal: ", error);
-            alert("Ocurrió un error al actualizar el personal.");
-          });
-      } else {
-        // Agregar nuevo personal
-        this.$api
-          .post("/api/Personal", formData)
-          .then((response) => {
-            this.$q.notify({
-              message: "Registro exitoso",
-              color: "positive",
-              timeout: 3000,
-              position: "top",
-            });
-            const newPerson = {
-              idPersonal: response.data.idPersonal,
-              nombre: response.data.nombre,
-              apellido: response.data.apellido,
-              idRol: response.data.idRol,
-              telefono: response.data.telefono,
-              correo: response.data.correo,
-              dni: response.data.dni,
-              estado: response.data.estado,
-              fechNacimiento: response.data.fechNacimiento,
-              username: response.data.username,
-              password: response.data.password,
-            };
-            this.personal.push(newPerson);
-            this.hideDialog();
-            setTimeout(() => {
-              this.fetchPersonalData();
-            }, 1000);
-          })
-          .catch((error) => {
-            console.error("Error al agregar el personal: ", error);
-            alert("Ocurrió un error al agregar el personal.");
-          });
-      }
-    },
+      this.$api
+        .post("/api/Personal", formData)
+        .then((response) => {
+          const result = response.data;
 
-    validateForm() {
-      // Validate name and surname (only letters)
+          // Manejar los códigos de error específicos
+          if (result === -2) {
+            this.$q.notify({
+              message: "El DNI ya está en uso.",
+              color: "negative",
+              timeout: 3000,
+              position: "top",
+            });
+          } else if (result === -3) {
+            this.$q.notify({
+              message: "El correo ya está en uso.",
+              color: "negative",
+              timeout: 3000,
+              position: "top",
+            });
+          } else if (result > 0) {
+            // Registro exitoso
+            this.$q.notify({
+              message: "Registro exitoso.",
+              color: "positive",
+              timeout: 3000,
+              position: "top",
+            });
+            this.personal.push(result);
+            this.hideAddDialog();
+            this.fetchPersonalData();
+          } else {
+            // Otros errores no esperados
+            this.$q.notify({
+              message: "Error desconocido al agregar el personal.",
+              color: "negative",
+              timeout: 3000,
+              position: "top",
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error al agregar el personal: ", error);
+          alert("Ocurrió un error al agregar el personal.");
+        });
+    },
+    submitEditForm() {
+      if (!this.validateForm(this.editForm)) {
+        return;
+      }
+
+      const formData = { ...this.editForm, idUbigeo: 1 };
+      formData.fechNacimiento = new Date(formData.fechNacimiento).toISOString();
+
+      this.$api
+        .put(`/api/Personal/${this.editForm.idPersonal}`, formData)
+        .then(() => {
+          this.$q.notify({
+            message: "Actualización exitosa",
+            color: "positive",
+            timeout: 3000,
+            position: "top",
+          });
+          const index = this.personal.findIndex(
+            (p) => p.idPersonal === this.editForm.idPersonal
+          );
+          this.personal.splice(index, 1, { ...formData });
+          this.hideEditDialog();
+          this.fetchPersonalData();
+        })
+        .catch((error) => {
+          console.error("Error al actualizar el personal: ", error);
+          alert("Ocurrió un error al actualizar el personal.");
+        });
+    },
+    validateForm(form) {
       if (
-        !/^[a-zA-Z\s]+$/.test(this.form.nombre) ||
-        !/^[a-zA-Z\s]+$/.test(this.form.apellido)
+        !/^[a-zA-Z\s]+$/.test(form.nombre) ||
+        !/^[a-zA-Z\s]+$/.test(form.apellido)
       ) {
         this.$q.notify({
           message: "El nombre y apellido deben contener solo letras.",
@@ -474,8 +607,7 @@ export default {
         return false;
       }
 
-      // Validate phone number (9 digits)
-      if (!/^\d{9}$/.test(this.form.telefono)) {
+      if (!/^\d{9}$/.test(form.telefono)) {
         this.$q.notify({
           message: "El número de teléfono debe contener 9 dígitos.",
           color: "red",
@@ -485,8 +617,7 @@ export default {
         return false;
       }
 
-      // Validate email (must contain @)
-      if (!this.form.correo.includes("@")) {
+      if (!form.correo.includes("@")) {
         this.$q.notify({
           message: "El correo electrónico debe contener @.",
           color: "red",
@@ -496,8 +627,7 @@ export default {
         return false;
       }
 
-      // Validate DNI (8 digits)
-      if (!/^\d{8}$/.test(this.form.dni)) {
+      if (!/^\d{8}$/.test(form.dni)) {
         this.$q.notify({
           message: "El DNI debe contener 8 dígitos numéricos.",
           color: "red",
@@ -510,16 +640,22 @@ export default {
       return true;
     },
     confirmDeletePerson(id) {
-      const confirmed = confirm(
-        "¿Estás seguro de que deseas eliminar este personal?"
-      );
-      if (confirmed) {
-        this.deletePerson(id);
+      this.personToDeleteId = id;
+      this.isDeleteDialogVisible = true;
+    },
+    hideDeleteDialog() {
+      this.isDeleteDialogVisible = false;
+      this.personToDeleteId = null;
+    },
+    executeDelete() {
+      if (this.personToDeleteId) {
+        this.deletePerson(this.personToDeleteId);
+        this.hideDeleteDialog();
       }
     },
     deletePerson(id) {
       this.$api
-        .delete(`/api/Personal/${id}`)
+        .delete(`/api/Personal/${id}/logical-delete`)
         .then(() => {
           this.$q.notify({
             message: "Eliminación exitosa",
@@ -527,10 +663,12 @@ export default {
             timeout: 3000,
             position: "top",
           });
-          this.personal = this.personal.filter(
+          /*this.personal = this.personal.filter(
             (person) => person.idPersonal !== id
-          );
-          //alert("Personal eliminado exitosamente.");
+          );*/
+          setTimeout(() => {
+            this.fetchPersonalData();
+          }, 750);
         })
         .catch((error) => {
           console.error("Error al eliminar el personal: ", error);
@@ -545,13 +683,13 @@ export default {
 
       let headers = {
         headers: {
-          Authorization: "Bearer " + token,
-          "Content-Type": "application/json",
-        },
-      };
+          "Authorization": "Bearer " + token,
+          "Content-Type": "application/json"
+        }
+      }
 
       this.$api
-        .get("/api/Personal", headers)
+        .get("/api/Personal",headers)
         .then((response) => {
           this.personal = response.data;
         })
@@ -568,6 +706,11 @@ export default {
         default:
           return "Desconocido";
       }
+    },
+    applyFilters() {
+      // Este método se llama cuando se cambian los filtros
+      // No es necesario implementarlo explícitamente ya que
+      // el filtrado se realiza en la propiedad computada filteredPersonal
     },
   },
   mounted() {
@@ -832,6 +975,57 @@ body {
 
 .cancel-button:hover {
   background-color: var(--secondary-hover);
+}
+.delete-confirmation {
+  max-width: 400px !important;
+  text-align: center;
+  padding: 2rem !important;
+}
+
+.delete-confirmation h2 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.delete-confirmation p {
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.confirmation-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.delete-confirm-button {
+  background-color: #ff3333;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.delete-confirm-button:hover {
+  background-color: #cc0000;
+}
+
+.delete-cancel-button {
+  background-color: #e0e0e0;
+  color: #666;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.delete-cancel-button:hover {
+  background-color: #d0d0d0;
 }
 
 @media (max-width: 768px) {
