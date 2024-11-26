@@ -518,18 +518,8 @@ export default {
       const formData = { ...this.addForm, estado: true, idUbigeo: 1 };
       formData.fechNacimiento = new Date(formData.fechNacimiento).toISOString();
 
-      let token = JSON.parse(localStorage.getItem("userData")).token;
-      //console.log(token)
-
-      let headers = {
-        headers: {
-          Authorization: "Bearer " + token,
-          "Content-Type": "application/json",
-        },
-      };
-
       this.$api
-        .post("/api/Personal", formData, headers)
+        .post("/api/Personal", formData)
         .then((response) => {
           const result = response.data;
 
@@ -582,17 +572,8 @@ export default {
       const formData = { ...this.editForm, idUbigeo: 1 };
       formData.fechNacimiento = new Date(formData.fechNacimiento).toISOString();
 
-      let token = JSON.parse(localStorage.getItem("userData")).token;
-      //console.log(token)
-
-      let headers = {
-        headers: {
-          Authorization: "Bearer " + token,
-          "Content-Type": "application/json",
-        },
-      };
       this.$api
-        .put(`/api/Personal/${this.editForm.idPersonal}`, formData, headers)
+        .put(`/api/Personal/${this.editForm.idPersonal}`, formData)
         .then(() => {
           this.$q.notify({
             message: "Actualización exitosa",
@@ -673,17 +654,8 @@ export default {
       }
     },
     deletePerson(id) {
-      let token = JSON.parse(localStorage.getItem("userData")).token;
-      //console.log(token)
-
-      let headers = {
-        headers: {
-          Authorization: "Bearer " + token,
-          "Content-Type": "application/json",
-        },
-      };
       this.$api
-        .delete(`/api/Personal/${id}/logical-delete`, headers)
+        .delete(`/api/Personal/${id}/logical-delete`)
         .then(() => {
           this.$q.notify({
             message: "Eliminación exitosa",
@@ -706,25 +678,6 @@ export default {
         });
     },
     fetchPersonalData() {
-      let token = JSON.parse(localStorage.getItem("userData")).token;
-      //console.log(token)
-
-      let headers = {
-        headers: {
-          Authorization: "Bearer " + token,
-          "Content-Type": "application/json",
-        },
-      };
-      let token = JSON.parse(localStorage.getItem("userData")).token;
-      //console.log(token)
-
-      let headers = {
-        headers: {
-          Authorization: "Bearer " + token,
-          "Content-Type": "application/json",
-        },
-      };
-
       this.$api
         .get("/api/Personal")
         .then((response) => {
