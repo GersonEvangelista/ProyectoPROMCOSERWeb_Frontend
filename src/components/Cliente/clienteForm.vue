@@ -495,8 +495,18 @@ export default {
   },
   methods: {
     obtenerClientes() {
+      let token = JSON.parse(localStorage.getItem("userData")).token;
+      //console.log(token)
+
+      let headers = {
+        headers: {
+          "Authorization": "Bearer " + token,
+          "Content-Type": "application/json"
+        }
+      }
+
       this.$api
-        .get("/api/Clientes")
+        .get("/api/Clientes",headers)
         .then((response) => {
           this.clientes = response.data;
           console.log("Clientes obtenidos:", JSON.stringify(this.clientes));

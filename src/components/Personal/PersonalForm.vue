@@ -540,8 +540,18 @@ export default {
         });
     },
     fetchPersonalData() {
+      let token = JSON.parse(localStorage.getItem("userData")).token;
+      //console.log(token)
+
+      let headers = {
+        headers: {
+          "Authorization": "Bearer " + token,
+          "Content-Type": "application/json"
+        }
+      }
+
       this.$api
-        .get("/api/Personal")
+        .get("/api/Personal",headers)
         .then((response) => {
           this.personal = response.data;
         })
