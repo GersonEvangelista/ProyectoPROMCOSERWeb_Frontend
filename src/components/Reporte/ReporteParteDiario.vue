@@ -269,8 +269,16 @@ export default {
   },
   methods: {
     obtenerPartes() {
+      let token = JSON.parse(localStorage.getItem("userData")).token;
+      let headers = {
+        headers: {
+          "Authorization": "Bearer " + token,
+          "Content-Type": "application/json"
+        }
+      }
+
       this.$api
-        .get("/api/ParteDiarios")
+        .get("/api/ParteDiarios",headers)
         .then((response) => {
           if (response.data && Array.isArray(response.data)) {
             this.partes = response.data;
@@ -285,8 +293,16 @@ export default {
     },
 
     obtenerDetalles(idParteDiario) {
+      let token = JSON.parse(localStorage.getItem("userData")).token;
+      let headers = {
+        headers: {
+          "Authorization": "Bearer " + token,
+          "Content-Type": "application/json"
+        }
+      }
+
       this.$api
-        .get("/api/DetalleParteDiarios")
+        .get("/api/DetalleParteDiariosConS",headers)
         .then((response) => {
           // Verifica si la respuesta contiene datos en un array
           if (response.data && Array.isArray(response.data)) {

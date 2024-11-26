@@ -29,13 +29,8 @@
             required
           />
         </div>
-        <div class="pass"><a href="#">¿Olvidaste tu contraseña?</a></div>
         <div class="row button">
           <input type="button" value="Login" @click="iniciarSesion" />
-        </div>
-        <div class="signup-link">
-          ¿No tienes cuenta?
-          <router-link to="/loginRegistro">Regístrate ahora</router-link>
         </div>
       </form>
     </div>
@@ -62,7 +57,9 @@
 }
 
 #fondo {
-  background-image: url(https://www.promcoser.com/wp-content/uploads/2015/08/011.jpg);
+  background-image:
+    linear-gradient(rgba(107, 96, 96, 0.5), rgba(243, 237, 237, 0.5)),
+    url(https://www.promcoser.com/wp-content/uploads/2015/08/011.jpg);
   background-size: cover; /* Hace que el fondo cubra toda la pantalla */
   background-position: center center; /* Centra el fondo en la pantalla */
   background-attachment: fixed; /* Mantiene el fondo fijo al hacer scroll */
@@ -221,18 +218,24 @@ export default {
         username: this.username,
         password: this.password,
       };
-      //console.log(user);
+
       this.$api
         .post(endpointURL, user)
         .then((response) => {
-          //console.log("Respuesta del servidor:", response);
+          localStorage.setItem("userData",JSON.stringify(response.data))
+          console.log("Respuesta del servidor:", response.data);
           this.$q.notify({
             message: "Inicio exitoso",
             color: "positive",
             timeout: 3000,
             position: "top",
           });
-          this.$router.push("/parteDiario");
+          if (response.data.idRol == 1) {
+            this.$router.push("/main");
+          } else {
+            this.$router.push("/mainOperador");
+          }
+
         })
         .catch((error) => {
           //console.log("Esto es error", user);

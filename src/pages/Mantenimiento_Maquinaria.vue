@@ -410,8 +410,16 @@ export default {
       };
     },
     fetchMachineryData() {
+      let token = JSON.parse(localStorage.getItem("userData")).token;
+      let headers = {
+        headers: {
+          "Authorization": "Bearer " + token,
+          "Content-Type": "application/json"
+        }
+      }
+
       this.$api
-        .get("/api/Maquinaria")
+        .get("/api/Maquinaria",headers)
         .then((response) => {
           this.machinery = response.data.map(this.normalizeMachineryData);
         })
