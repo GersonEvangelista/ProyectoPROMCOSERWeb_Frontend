@@ -257,7 +257,17 @@ export default {
     // Función para obtener los clientes desde la API
     async fetchClientes() {
       try {
-        const response = await this.$api.get("/api/Clientes");
+        let token = JSON.parse(localStorage.getItem("userData")).token;
+      //console.log(token)
+
+      let headers = {
+        headers: {
+          "Authorization": "Bearer " + token,
+          "Content-Type": "application/json"
+        }
+      }
+
+        const response = await this.$api.get("/api/Clientes",headers);
         //console.log(response);
         this.clientesOptions = response.data.map((cliente) => cliente.nombre);
         this.clientesAllOptions = response.data;
