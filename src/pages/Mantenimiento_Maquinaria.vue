@@ -444,7 +444,8 @@ export default {
               error.response && error.response.data
                 ? error.response.data
                 : error.message;
-            alert("Error al agregar la maquinaria: " + errorMessage);
+
+            console.log("Error al agregar la maquinaria: " + errorMessage);
           });
       }
     },
@@ -479,7 +480,7 @@ export default {
         })
         .catch((error) => {
           console.error("Error al eliminar la maquinaria: ", error);
-          alert(
+          console.log(
             "Ocurrió un error al eliminar la maquinaria. Por favor, inténtalo de nuevo"
           );
         });
