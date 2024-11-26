@@ -545,13 +545,13 @@ export default {
 
       let headers = {
         headers: {
-          "Authorization": "Bearer " + token,
-          "Content-Type": "application/json"
-        }
-      }
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      };
 
       this.$api
-        .get("/api/Personal",headers)
+        .get("/api/Personal", headers)
         .then((response) => {
           this.personal = response.data;
         })
