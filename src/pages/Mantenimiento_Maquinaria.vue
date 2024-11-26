@@ -364,13 +364,28 @@ export default {
           (!this.isEditing || machine.idMaquinaria !== this.form.idMaquinaria)
       );
       if (placaExiste) {
-        alert("La placa ya existe. Por favor, ingrese una placa única.");
+        this.$q.notify({
+          message: "La placa ya existe. Por favor, ingrese una placa única.",
+          color: "red",
+          timeout: 3000,
+          position: "top",
+        });
         return;
       }
 
       if (this.isEditing) {
+        this.$api;
+        let token = JSON.parse(localStorage.getItem("userData")).token;
+        //console.log(token)
+
+        let headers = {
+          headers: {
+            Authorization: "Bearer " + token,
+            "Content-Type": "application/json",
+          },
+        };
         this.$api
-          .put(`/api/Maquinaria/${this.form.idMaquinaria}`, this.form)
+          .put(`/api/Maquinaria/${this.form.idMaquinaria}`, this.form, headers)
           .then(() => {
             const index = this.machinery.findIndex(
               (m) => m.idMaquinaria === this.form.idMaquinaria
@@ -391,12 +406,27 @@ export default {
               error.response && error.response.data
                 ? error.response.data
                 : error.message;
-            alert("Error al actualizar la maquinaria: " + errorMessage);
+            this.$q.notify({
+              message: "Error al actualizar la maquinaria: " + errorMessage,
+              color: "positive",
+              timeout: 3000,
+              position: "top",
+            });
           });
       } else {
         const { idMaquinaria, ...maquinariaData } = this.form;
+
+        let token = JSON.parse(localStorage.getItem("userData")).token;
+        //console.log(token)
+
+        let headers = {
+          headers: {
+            Authorization: "Bearer " + token,
+            "Content-Type": "application/json",
+          },
+        };
         this.$api
-          .post("/api/Maquinaria", maquinariaData)
+          .post("/api/Maquinaria", maquinariaData, headers)
           .then((response) => {
             this.machinery.push(response.data);
             //alert("Maquinaria agregada exitosamente.");
@@ -424,8 +454,17 @@ export default {
       this.isConfirmDialogVisible = true; // Muestra el diálogo
     },
     deleteMachine(id) {
+      let token = JSON.parse(localStorage.getItem("userData")).token;
+      //console.log(token)
+
+      let headers = {
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      };
       this.$api
-        .delete(`/api/Maquinaria/${id}`)
+        .delete(`/api/Maquinaria/${id}`, headers)
         .then(() => {
           this.machinery = this.machinery.filter(
             (machine) => machine.idMaquinaria !== id
@@ -459,15 +498,17 @@ export default {
     },
     fetchMachineryData() {
       let token = JSON.parse(localStorage.getItem("userData")).token;
+      //console.log(token)
+
       let headers = {
         headers: {
-          "Authorization": "Bearer " + token,
-          "Content-Type": "application/json"
-        }
-      }
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      };
 
       this.$api
-        .get("/api/Maquinaria",headers)
+        .get("/api/Maquinaria", headers)
         .then((response) => {
           this.machinery = response.data.map(this.normalizeMachineryData);
         })
