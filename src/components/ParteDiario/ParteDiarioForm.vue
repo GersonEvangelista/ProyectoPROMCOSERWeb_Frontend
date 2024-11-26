@@ -407,6 +407,12 @@ export default {
 
     finDeRegistro() {
       window.location.reload();
+      this.$q.notify({
+            message: "Registro parte diario terminado",
+            color: "positive",
+            timeout: 3000,
+            position: "top",
+          });
     },
 
     // Función para guardar el parte diario
