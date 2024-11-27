@@ -10,17 +10,22 @@
           />
         </div>
         <div class="header-divider"></div>
-        <h1 class="title">
-          <h1 class="title">Registro Histórico de Partes Diarios</h1>
-        </h1>
+        <h1 class="title">Gestión de Partes Diarios</h1>
       </header>
 
       <main>
+        <button @click="downloadPdf" class="detalles-button">
+          Exportar a PDF
+        </button>
+        <button @click="downloadExcel" class="detalles-button">
+          Exportar a Excel
+        </button>
+
         <table class="parte-table">
           <thead>
             <tr>
-              <th>ID Parte</th>
-              <th>Serie</th>
+              <th v-if="false">ID Parte</th>
+              <th v-if="false">Serie</th>
               <th>Fecha</th>
               <th>Firmas</th>
               <th>Horómetro Inicio</th>
@@ -35,14 +40,14 @@
               <th>Mostrar</th>
             </tr>
             <tr>
-              <th>
+              <th v-if="false">
                 <input
                   type="text"
                   v-model="filters.idParteDiario"
                   placeholder="Filtrar..."
                 />
               </th>
-              <th>
+              <th v-if="false">
                 <input
                   type="text"
                   v-model="filters.serie"
@@ -73,22 +78,22 @@
               </th>
               <th>
                 <input
-                  type="number"
-                  v-model="filters.idCliente"
+                  type="text"
+                  v-model="filters.cliente"
                   placeholder="Filtrar..."
                 />
               </th>
               <th>
                 <input
-                  type="number"
-                  v-model="filters.idPersonal"
+                  type="text"
+                  v-model="filters.personal"
                   placeholder="Filtrar..."
                 />
               </th>
               <th>
                 <input
-                  type="number"
-                  v-model="filters.idMaquinaria"
+                  type="text"
+                  v-model="filters.maquinaria"
                   placeholder="Filtrar..."
                 />
               </th>
@@ -121,15 +126,18 @@
           </thead>
           <tbody>
             <tr v-for="parte in filteredPartes" :key="parte.idParteDiario">
-              <td>{{ parte.idParteDiario }}</td>
-              <td>{{ parte.serie }}</td>
+              <td v-if="false">{{ parte.idParteDiario }}</td>
+              <td v-if="false">{{ parte.serie }}</td>
               <td>{{ new Date(parte.fecha).toLocaleDateString() }}</td>
               <td>{{ parte.firmas ? "Firmado" : "No firmado" }}</td>
               <td>{{ parte.horometroInicio }}</td>
               <td>{{ parte.horometroFinal }}</td>
-              <td>{{ parte.idCliente }}</td>
-              <td>{{ parte.idPersonal }}</td>
-              <td>{{ parte.idMaquinaria }}</td>
+              <td>{{ parte.cliente }}</td>
+              <!-- Descripción del cliente -->
+              <td>{{ parte.personal }}</td>
+              <!-- Descripción del personal -->
+              <td>{{ parte.maquinaria }}</td>
+              <!-- Descripción de la maquinaria -->
               <td>{{ parte.lugarTrabajo }}</td>
               <td>{{ parte.petroleo }}</td>
               <td>{{ parte.aceite }}</td>
@@ -148,8 +156,8 @@
         <table class="detalle-table">
           <thead>
             <tr>
-              <th>ID Detalle</th>
-              <th>ID Parte Diario</th>
+              <th v-if="false">ID Detalle</th>
+              <th v-if="false">ID Parte Diario</th>
               <th>Horas</th>
               <th>Trabajo Efectuado</th>
               <th>Descripción</th>
@@ -157,8 +165,8 @@
           </thead>
           <tbody>
             <tr v-for="detalle in detalles" :key="detalle.idDetalleParteDiario">
-              <td>{{ detalle.idDetalleParteDiario }}</td>
-              <td>{{ detalle.idParteDiario }}</td>
+              <td v-if="false">{{ detalle.idDetalleParteDiario }}</td>
+              <td v-if="false">{{ detalle.idParteDiario }}</td>
               <td>{{ detalle.horas }}</td>
               <td>{{ detalle.trabajoEfectuado }}</td>
               <td>{{ detalle.descripcion }}</td>
@@ -183,7 +191,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="parte in partes" :key="parte.idParteDiario">
+            <tr v-for="parte in filteredPartes" :key="parte.idParteDiario">
               <td>{{ parte.idParteDiario }}</td>
               <td>{{ parte.serie }}</td>
               <td>{{ new Date(parte.fecha).toLocaleDateString() }}</td>
@@ -215,10 +223,14 @@
 </template>
 
 <script>
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 export default {
   name: "ParteDiarioTable",
   data() {
     return {
+      jsonData: [],
       partes: [], // Lista de partes obtenida de la API
       detalles: [], // Lista de detalles filtrados por ID
       filters: {
@@ -228,9 +240,9 @@ export default {
         firmas: "",
         horometroInicio: "",
         horometroFinal: "",
-        idCliente: "",
-        idPersonal: "",
-        idMaquinaria: "",
+        cliente: "", // Cambiado de idCliente a cliente
+        personal: "", // Cambiado de idPersonal a personal
+        maquinaria: "", // Cambiado de idMaquinaria a maquinaria
         lugarTrabajo: "",
         petroleo: "",
         aceite: "",
@@ -242,67 +254,327 @@ export default {
     filteredPartes() {
       return this.partes.filter((parte) => {
         return Object.keys(this.filters).every((key) => {
-          const filterValue = this.filters[key]?.toString().toLowerCase();
-          const parteValue = parte[key]?.toString().toLowerCase();
-
-          if (!filterValue) {
-            return true; // Si el filtro está vacío, no afecta
-          }
-
-          // Para valores numéricos
-          if (!isNaN(parte[key]) && !isNaN(this.filters[key])) {
-            return parte[key].toString().startsWith(filterValue);
-          }
-
-          // Para fechas
-          if (key === "fecha" || key === "proximoMantenimiento") {
-            return new Date(parte[key])
-              .toLocaleDateString()
-              .includes(filterValue);
-          }
-
-          // Para texto
-          return parteValue.includes(filterValue);
+          if (this.filters[key] === "") return true; // No filtrar si el campo está vacío
+          const parteValue = parte[key]?.toString().toLowerCase() || ""; // Convertir a string y manejar null/undefined
+          const filterValue = this.filters[key]?.toString().toLowerCase(); // Convertir a string
+          return parteValue.includes(filterValue); // Comparar cadenas
         });
       });
     },
   },
   methods: {
-    obtenerPartes() {
-      let token = JSON.parse(localStorage.getItem("userData")).token;
-      let headers = {
-        headers: {
-          "Authorization": "Bearer " + token,
-          "Content-Type": "application/json"
+    async obtenerNombreCompleto(endpoint, id) {
+      if (!id) {
+        console.warn(`ID inválido para ${endpoint}`);
+        return null; // Si el ID no es válido, retorna null
+      }
+
+      try {
+        const response = await this.$api.get(`${endpoint}/${id}`);
+        const data = response.data;
+        if (data && data.nombre && data.apellido) {
+          return `${data.nombre} ${data.apellido}`; // Devuelve el nombre completo
+        } else if (data && data.nombre) {
+          return data.nombre; // Devuelve el nombre si no hay apellido
+        }
+        return "Sin información"; // Si no hay datos válidos, retorna un texto predeterminado
+      } catch (error) {
+        console.error(`Error al obtener datos de ${endpoint}/${id}:`, error);
+        return "Error al obtener"; // En caso de error, retorna un texto predeterminado
+      }
+    },
+    async obtenerDescripcionMaquinaria(endpoint, id) {
+      if (!id) {
+        console.warn(`ID inválido para ${endpoint}`);
+        return null; // Si el ID no es válido, retorna null
+      }
+
+      try {
+        const response = await this.$api.get(`${endpoint}/${id}`);
+        const data = response.data;
+
+        if (data && data.modelo && data.marca) {
+          return `${data.placa} - ${data.modelo}`; // Devuelve "Marca - Modelo"
+        } else if (data && data.modelo) {
+          return data.modelo; // Devuelve solo el modelo si no hay marca
+        } else if (data && data.marca) {
+          return data.placa; // Devuelve solo la marca si no hay modelo
+        }
+
+        return "Sin descripción"; // Si no hay datos válidos, retorna un texto predeterminado
+      } catch (error) {
+        console.error(`Error al obtener datos de ${endpoint}/${id}:`, error);
+        return "Error al obtener descripción"; // En caso de error, retorna un texto predeterminado
+      }
+    },
+
+    async obtenerPartesPdfExcel() {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        const response = await this.$api.get("/api/ParteDiarios");
+        const partes = response.data;
+
+        // Mapeo asíncrono para obtener nombres completos
+        this.jsonData = await Promise.all(
+          partes.map(async (parte) => {
+            const cliente = await this.obtenerNombreCompleto(
+              "/api/Clientes",
+              parte.idCliente
+            );
+            const personal = await this.obtenerNombreCompleto(
+              "/api/Personal",
+              parte.idPersonal
+            );
+            const maquinaria = await this.obtenerDescripcionMaquinaria(
+              "/api/Maquinaria",
+              parte.idMaquinaria
+            );
+
+            return {
+              idParteDiario: parte.idParteDiario,
+              serie: parte.serie,
+              fecha: parte.fecha.split("T")[0], // Formato 'YYYY-MM-DD'
+              firmas: parte.firmas,
+              horometroInicio: parte.horometroInicio,
+              horometroFinal: parte.horometroFinal,
+              cliente: cliente, // Nombre completo del cliente
+              personal: personal, // Nombre completo del personal
+              maquinaria: maquinaria, // Nombre de la maquinaria
+              lugarTrabajo: parte.lugarTrabajo,
+              petroleo: parte.petroleo,
+              aceite: parte.aceite,
+              proximoMantenimiento: parte.proximoMantenimiento.split("T")[0], // Formato 'YYYY-MM-DD'
+            };
+          })
+        );
+      } catch (err) {
+        console.error("Error al obtener partes:", err);
+        this.error = err.message || "Error al obtener los datos";
+      } finally {
+        this.loading = false;
+      }
+    },
+    downloadExcel() {
+      if (this.jsonData.length === 0) {
+        alert("No hay datos para descargar");
+        return;
+      }
+
+      // Crear una hoja de cálculo (worksheet) a partir del JSON
+      const worksheet = XLSX.utils.json_to_sheet(this.jsonData);
+
+      // Crear un libro de trabajo (workbook)
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "ParteDiario");
+
+      // Generar archivo Excel
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+
+      // Crear un objeto Blob para descarga
+      const blob = new Blob([excelBuffer], {
+        type: "application/octet-stream",
+      });
+
+      // Crear enlace de descarga
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "ParteDiario.xlsx"; // Nombre del archivo
+      link.click();
+    },
+    async generarArrayConDetalles() {
+      try {
+        const partesResponse = await this.$api.get("/api/ParteDiarios");
+        const partes = partesResponse.data;
+
+        const arrayConDetalles = await Promise.all(
+          partes.map(async (parte) => {
+            const detallesResponse = await this.$api.get(
+              `/api/DetalleParteDiarios/ParteDiario/${parte.idParteDiario}`
+            );
+            const detalles = detallesResponse.data || [];
+
+            return {
+              idParteDiario: parte.idParteDiario,
+              serie: parte.serie,
+              fecha: parte.fecha.split("T")[0], // Formato 'YYYY-MM-DD'
+              firmas: parte.firmas ? "Sí" : "No",
+              horometroInicio: parte.horometroInicio,
+              horometroFinal: parte.horometroFinal,
+              cliente: await this.obtenerNombreCompleto(
+                "/api/Clientes",
+                parte.idCliente
+              ),
+              personal: await this.obtenerNombreCompleto(
+                "/api/Personal",
+                parte.idPersonal
+              ),
+              maquinaria: await this.obtenerDescripcionMaquinaria(
+                "/api/Maquinaria",
+                parte.idMaquinaria
+              ),
+              lugarTrabajo: parte.lugarTrabajo,
+              petroleo: parte.petroleo,
+              aceite: parte.aceite,
+              proximoMantenimiento: parte.proximoMantenimiento.split("T")[0],
+              detalles, // Agregar los detalles obtenidos
+            };
+          })
+        );
+
+        this.jsonData = arrayConDetalles; // Almacenar el array para usarlo posteriormente
+      } catch (error) {
+        console.error("Error al generar el array con detalles:", error);
+      }
+    },
+    async downloadPdf() {
+      const doc = new jsPDF();
+
+      // Título principal
+      doc.setFontSize(16);
+      doc.setTextColor(40);
+      doc.text("Reporte Completo de Partes Diarios", 14, 10);
+
+      let startY = 20; // Inicio de la posición Y
+
+      for (const parte of this.jsonData) {
+        // Encabezado de cada Parte Diario
+        doc.setFontSize(12);
+        doc.setTextColor(40);
+        doc.text(`Parte Diario #${parte.idParteDiario}`, 14, startY);
+        startY += 6;
+
+        // Información general del Parte Diario
+        doc.autoTable({
+          startY,
+          head: [
+            ["Serie", "Fecha", "Firmas", "Cliente", "Personal", "Maquinaria"],
+          ],
+          body: [
+            [
+              parte.serie,
+              parte.fecha,
+              parte.firmas ? "Firmado" : "No firmado",
+              parte.cliente,
+              parte.personal,
+              parte.maquinaria,
+            ],
+          ],
+          theme: "striped",
+          headStyles: {
+            fillColor: [41, 128, 185], // Azul para encabezados
+            textColor: [255, 255, 255], // Texto blanco
+            fontSize: 10,
+          },
+          styles: { fontSize: 10 },
+          bodyStyles: { textColor: [40, 40, 40] },
+        });
+        startY = doc.lastAutoTable.finalY + 10; // Actualizar la posición Y
+
+        // Obtener los detalles del Parte Diario desde el endpoint
+        let detalles = [];
+        try {
+          const response = await this.$api.get(
+            `/api/DetalleParteDiariosConS/ParteDiario/${parte.idParteDiario}`
+          );
+          detalles = response.data; // Asignar los detalles obtenidos
+        } catch (error) {
+          console.error(
+            `Error al obtener detalles para Parte Diario #${parte.idParteDiario}:`,
+            error
+          );
+          detalles = []; // Si hay error, asignar arreglo vacío
+        }
+
+        // Añadir la tabla de detalles al PDF
+        if (detalles.length > 0) {
+          doc.setFontSize(10);
+          doc.setTextColor(40);
+          doc.text("Detalles:", 14, startY);
+          startY += 6;
+
+          doc.autoTable({
+            startY,
+            head: [["Horas", "Trabajo Efectuado", "Descripción"]],
+            body: detalles.map((detalle) => [
+              detalle.horas,
+              detalle.trabajoEfectuado,
+              detalle.descripcion,
+            ]),
+            theme: "grid",
+            headStyles: {
+              fillColor: [100, 100, 100], // Gris oscuro para encabezados
+              textColor: [255, 255, 255], // Texto blanco
+              fontSize: 9,
+            },
+            styles: { fontSize: 9 },
+            bodyStyles: { textColor: [40, 40, 40] },
+          });
+          startY = doc.lastAutoTable.finalY + 10; // Actualizar la posición Y
+        } else {
+          doc.setFontSize(10);
+          doc.setTextColor(150, 0, 0); // Rojo para texto sin detalles
+          doc.text("No hay detalles para este Parte Diario.", 14, startY);
+          startY += 10;
+        }
+
+        // Salto de página si necesario
+        if (startY > 270) {
+          doc.addPage();
+          startY = 20; // Reiniciar la posición Y en la nueva página
         }
       }
 
-      this.$api
-        .get("/api/ParteDiarios",headers)
-        .then((response) => {
-          if (response.data && Array.isArray(response.data)) {
-            this.partes = response.data;
-            console.log("Partes obtenidos:", this.partes);
-          } else {
-            console.error("La respuesta no tiene el formato esperado.");
-          }
-        })
-        .catch((error) => {
-          console.error("Error al obtener los partes:", error);
-        });
+      // Descargar el archivo PDF
+      doc.save("PartesDiarios_Reporte.pdf");
+    },
+    async obtenerPartes() {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        const response = await this.$api.get("/api/ParteDiarios");
+        const partes = response.data;
+
+        // Mapeo asíncrono para obtener descripciones completas
+        this.partes = await Promise.all(
+          partes.map(async (parte) => {
+            const cliente = await this.obtenerNombreCompleto(
+              "/api/Clientes",
+              parte.idCliente
+            );
+            const personal = await this.obtenerNombreCompleto(
+              "/api/Personal",
+              parte.idPersonal
+            );
+            const maquinaria = await this.obtenerDescripcionMaquinaria(
+              "/api/Maquinaria",
+              parte.idMaquinaria
+            );
+
+            return {
+              ...parte, // Mantén los datos originales
+              cliente, // Agrega el nombre del cliente
+              personal, // Agrega el nombre del personal
+              maquinaria, // Agrega la descripción de la maquinaria
+            };
+          })
+        );
+      } catch (error) {
+        console.error("Error al obtener partes diarios:", error);
+        this.error = error.message || "Error al obtener los datos";
+      } finally {
+        this.loading = false;
+      }
     },
 
     obtenerDetalles(idParteDiario) {
-      let token = JSON.parse(localStorage.getItem("userData")).token;
-      let headers = {
-        headers: {
-          "Authorization": "Bearer " + token,
-          "Content-Type": "application/json"
-        }
-      }
-
       this.$api
-        .get("/api/DetalleParteDiariosConS",headers)
+        .get("/api/DetalleParteDiariosConS")
         .then((response) => {
           // Verifica si la respuesta contiene datos en un array
           if (response.data && Array.isArray(response.data)) {
@@ -331,6 +603,7 @@ export default {
           console.error("Error al obtener los detalles:", error);
         });
     },
+
     mostrarDetalle(parte) {
       // Llama a obtenerDetalles pasando el ID del parte seleccionado
       this.obtenerDetalles(parte.idParteDiario);
@@ -338,6 +611,7 @@ export default {
   },
   mounted() {
     this.obtenerPartes();
+    this.obtenerPartesPdfExcel();
   },
 };
 </script>
@@ -449,11 +723,11 @@ body {
 }
 
 .title {
-  font-size: 28px;
+  font-size: 28px; /* Ajusta el tamaño si es necesario */
   font-weight: bold;
   color: var(--primary-color);
-  text-align: center; /* Centrar horizontalmente */
-  margin: 20px 0; /* Espaciado superior e inferior */
+  margin: 0 auto; /* Centra horizontalmente */
+  text-align: center; /* Centra el texto */
 }
 
 .search-container {

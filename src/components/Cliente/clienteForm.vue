@@ -51,7 +51,7 @@
         <table class="client-table">
           <thead>
             <tr>
-              <th>ID Cliente</th>
+              <th v-if="false">ID Cliente</th>
               <th>Tipo Cliente</th>
               <th>Nombre</th>
               <th>Apellido</th>
@@ -65,13 +65,6 @@
               <th>Acciones</th>
             </tr>
             <tr>
-              <th>
-                <input
-                  type="text"
-                  v-model="filters.idCliente"
-                  placeholder="Filtrar..."
-                />
-              </th>
               <th>
                 <select v-model="filters.tipoCliente">
                   <option value="">Todos</option>
@@ -147,7 +140,7 @@
           </thead>
           <tbody>
             <tr v-for="cliente in filteredClientes" :key="cliente.idCliente">
-              <td>{{ cliente.idCliente }}</td>
+              <td v-if="false">{{ cliente.idCliente }}</td>
               <td>{{ cliente.tipoCliente }}</td>
               <td>{{ cliente.nombre }}</td>
               <td>{{ cliente.apellido }}</td>
@@ -214,95 +207,117 @@
         <div class="dialog-content">
           <h2 id="dialogTitle">Agregar Nuevo Cliente</h2>
           <form id="clientForm">
-            <div class="form-group">
-              <label for="tipoCliente">Tipo Cliente</label>
-              <select
-                id="tipoCliente"
-                name="tipoCliente"
-                required
-                v-model="tipoCliente"
-              >
-                <option value="natural">natural</option>
-                <option value="empresa">empresa</option>
-              </select>
+            <div class="form-grid">
+              <div class="form-column">
+                <div class="form-group">
+                  <label for="tipoCliente">Tipo Cliente</label>
+                  <select
+                    id="tipoCliente"
+                    name="tipoCliente"
+                    required
+                    v-model="tipoCliente"
+                    @change="handleTipoClienteChange"
+                  >
+                    <option value="natural">Natural</option>
+                    <option value="empresa">Empresa</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="nombre">Nombre</label>
+                  <input
+                    type="text"
+                    id="nombre"
+                    name="nombre"
+                    required
+                    v-model="nombre"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="apellido">Apellido</label>
+                  <input
+                    type="text"
+                    id="apellido"
+                    name="apellido"
+                    required
+                    v-model="apellido"
+                  />
+                </div>
+                <div class="form-group" v-if="divDNI">
+                  <label for="dni">DNI</label>
+                  <input
+                    type="text"
+                    id="dni"
+                    name="dni"
+                    required
+                    v-model="dni"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="telefono">Teléfono</label>
+                  <input
+                    type="text"
+                    id="telefono"
+                    name="telefono"
+                    required
+                    v-model="telefono"
+                  />
+                </div>
+              </div>
+              <div class="form-column">
+                <div class="form-group">
+                  <label for="correo">Correo</label>
+                  <input
+                    type="email"
+                    id="correo"
+                    name="correo"
+                    required
+                    v-model="correo"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="direccion">Dirección</label>
+                  <input
+                    type="text"
+                    id="direccion"
+                    name="direccion"
+                    required
+                    v-model="direccion"
+                  />
+                </div>
+                <div class="form-group" v-if="false">
+                  <label for="estado">Estado</label>
+                  <select id="estado" name="estado" required v-model="estado">
+                    <option value="true">Activo</option>
+                    <option value="false">Inactivo</option>
+                  </select>
+                </div>
+                <div class="form-group" v-if="divRazonSocial">
+                  <label for="razonSocial">Razón Social</label>
+                  <input
+                    type="text"
+                    id="razonSocial"
+                    name="razonSocial"
+                    required
+                    v-model="razonSocial"
+                  />
+                </div>
+                <div class="form-group" v-if="divRUC">
+                  <label for="ruc">RUC</label>
+                  <input
+                    type="text"
+                    id="ruc"
+                    name="ruc"
+                    required
+                    v-model="ruc"
+                  />
+                </div>
+              </div>
             </div>
-
-            <div class="form-group">
-              <label for="nombre">Nombre</label>
-              <input
-                type="text"
-                id="nombre"
-                name="nombre"
-                required
-                v-model="nombre"
-              />
-            </div>
-            <div class="form-group">
-              <label for="apellido">Apellido</label>
-              <input
-                type="text"
-                id="apellido"
-                name="apellido"
-                required
-                v-model="apellido"
-              />
-            </div>
-            <div class="form-group">
-              <label for="dni">DNI</label>
-              <input type="text" id="dni" name="dni" required v-model="dni" />
-            </div>
-            <div class="form-group">
-              <label for="telefono">Teléfono</label>
-              <input
-                type="text"
-                id="telefono"
-                name="telefono"
-                required
-                v-model="telefono"
-              />
-            </div>
-            <div class="form-group">
-              <label for="correo">Correo</label>
-              <input
-                type="email"
-                id="correo"
-                name="correo"
-                required
-                v-model="correo"
-              />
-            </div>
-            <div class="form-group">
-              <label for="direccion">Dirección</label>
-              <input
-                type="text"
-                id="direccion"
-                name="direccion"
-                required
-                v-model="direccion"
-              />
-            </div>
-            <div class="form-group">
-              <label for="estado">Estado</label>
-              <select id="estado" name="estado" required v-model="estado">
-                <option value="true">Activo</option>
-                <option value="false">Inactivo</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="razonSocial">Razón Social</label>
-              <input
-                type="text"
-                id="razonSocial"
-                name="razonSocial"
-                required
-                v-model="razonSocial"
-              />
-            </div>
-            <div class="form-group">
-              <label for="ruc">RUC</label>
-              <input type="text" id="ruc" name="ruc" required v-model="ruc" />
-            </div>
-            <button type="submit" class="submit-button" @click="saveClient">
+            <button
+              type="submit"
+              class="submit-button"
+              @click.prevent="saveClient"
+            >
               Agregar
             </button>
           </form>
@@ -315,110 +330,125 @@
         @click.self="cerrarDialogUpdate"
       >
         <div class="dialog-content">
-          <h2 id="dialogTitle">Actualizar datos del Cliente</h2>
-          <form id="clientForm">
-            <div class="form-group">
-              <label for="tipoCliente">Tipo Cliente</label>
-              <select
-                id="tipoCliente"
-                name="tipoCliente"
-                required
-                v-model="updatetipoCliente"
-              >
-                <option value="natural">natural</option>
-                <option value="empresa">empresa</option>
-              </select>
+          <h2 id="dialogTitle">Actualizar Cliente</h2>
+          <form id="updateClientForm">
+            <div class="form-grid">
+              <div class="form-column">
+                <div class="form-group">
+                  <label for="tipoCliente">Tipo Cliente</label>
+                  <select
+                    id="tipoCliente"
+                    name="tipoCliente"
+                    required
+                    v-model="updatetipoCliente"
+                    @change="handleTipoClienteChangeUpdate"
+                  >
+                    <option value="natural">Natural</option>
+                    <option value="empresa">Empresa</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="nombre">Nombre</label>
+                  <input
+                    type="text"
+                    id="nombre"
+                    name="nombre"
+                    required
+                    v-model="updatenombre"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="apellido">Apellido</label>
+                  <input
+                    type="text"
+                    id="apellido"
+                    name="apellido"
+                    required
+                    v-model="updateapellido"
+                  />
+                </div>
+                <div class="form-group" v-if="divDNIupdate">
+                  <label for="dni">DNI</label>
+                  <input
+                    type="text"
+                    id="dni"
+                    name="dni"
+                    required
+                    v-model="updatedni"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="telefono">Teléfono</label>
+                  <input
+                    type="text"
+                    id="telefono"
+                    name="telefono"
+                    required
+                    v-model="updatetelefono"
+                  />
+                </div>
+              </div>
+              <div class="form-column">
+                <div class="form-group">
+                  <label for="correo">Correo</label>
+                  <input
+                    type="email"
+                    id="correo"
+                    name="correo"
+                    required
+                    v-model="updatecorreo"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="direccion">Dirección</label>
+                  <input
+                    type="text"
+                    id="direccion"
+                    name="direccion"
+                    required
+                    v-model="updatedireccion"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="estado">Estado</label>
+                  <select
+                    id="estado"
+                    name="estado"
+                    required
+                    v-model="updateestado"
+                  >
+                    <option value="true">Activo</option>
+                    <option value="false">Inactivo</option>
+                  </select>
+                </div>
+                <div class="form-group" v-if="divRazonSocialupdate">
+                  <label for="razonSocial">Razón Social</label>
+                  <input
+                    type="text"
+                    id="razonSocial"
+                    name="razonSocial"
+                    required
+                    v-model="updaterazonSocial"
+                  />
+                </div>
+                <div class="form-group" v-if="divRUCupdate">
+                  <label for="ruc">RUC</label>
+                  <input
+                    type="text"
+                    id="ruc"
+                    name="ruc"
+                    required
+                    v-model="updateruc"
+                  />
+                </div>
+              </div>
             </div>
-
-            <div class="form-group">
-              <label for="nombre">Nombre</label>
-              <input
-                type="text"
-                id="nombre"
-                name="nombre"
-                required
-                v-model="updatenombre"
-              />
-            </div>
-            <div class="form-group">
-              <label for="apellido">Apellido</label>
-              <input
-                type="text"
-                id="apellido"
-                name="apellido"
-                required
-                v-model="updateapellido"
-              />
-            </div>
-            <div class="form-group">
-              <label for="dni">DNI</label>
-              <input
-                type="text"
-                id="dni"
-                name="dni"
-                required
-                v-model="updatedni"
-              />
-            </div>
-            <div class="form-group">
-              <label for="telefono">Teléfono</label>
-              <input
-                type="text"
-                id="telefono"
-                name="telefono"
-                required
-                v-model="updatetelefono"
-              />
-            </div>
-            <div class="form-group">
-              <label for="correo">Correo</label>
-              <input
-                type="email"
-                id="correo"
-                name="correo"
-                required
-                v-model="updatecorreo"
-              />
-            </div>
-            <div class="form-group">
-              <label for="direccion">Dirección</label>
-              <input
-                type="text"
-                id="direccion"
-                name="direccion"
-                required
-                v-model="updatedireccion"
-              />
-            </div>
-            <div class="form-group">
-              <label for="estado">Estado</label>
-              <select id="estado" name="estado" required v-model="updateestado">
-                <option value="true">Activo</option>
-                <option value="false">Inactivo</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="razonSocial">Razón Social</label>
-              <input
-                type="text"
-                id="razonSocial"
-                name="razonSocial"
-                required
-                v-model="updaterazonSocial"
-              />
-            </div>
-            <div class="form-group">
-              <label for="ruc">RUC</label>
-              <input
-                type="text"
-                id="ruc"
-                name="ruc"
-                required
-                v-model="updateruc"
-              />
-            </div>
-            <button type="submit" class="submit-button" @click="updateClient">
-              Actulizar
+            <button
+              type="submit"
+              class="submit-button"
+              @click.prevent="updateClient"
+            >
+              Actualizar
             </button>
           </form>
         </div>
@@ -450,6 +480,13 @@ export default {
   name: "ClientTable",
   data() {
     return {
+      tipoCliente: "natural", // Valor inicial
+      divDNI: true, // Mostrar DNI inicialmente
+      divRUC: false, // Ocultar RUC inicialmente
+      divRazonSocial: false,
+      divDNIupdate: true,
+      divRUCupdate: false,
+      divRazonSocialupdate: false,
       clientes: [], // Lista de clientes obtenida de la API
       clienteParaEliminar: null, // Cliente seleccionado para eliminar
       searchQuery: "", // Almacena la consulta de búsqueda
@@ -494,19 +531,36 @@ export default {
     },
   },
   methods: {
-    obtenerClientes() {
-      let token = JSON.parse(localStorage.getItem("userData")).token;
-      //console.log(token)
-
-      let headers = {
-        headers: {
-          "Authorization": "Bearer " + token,
-          "Content-Type": "application/json"
-        }
+    handleTipoClienteChange() {
+      if (this.tipoCliente === "natural") {
+        // Resetea los campos de empresa si se selecciona Cliente Natural
+        this.divRUC = false;
+        this.divRazonSocial = false;
+        this.divDNI = true;
+      } else if (this.tipoCliente === "empresa") {
+        this.divRUC = true;
+        this.divRazonSocial = true;
+        // Resetea los campos de cliente natural si se selecciona Cliente Empresa
+        this.divDNI = false;
       }
+    },
+    handleTipoClienteChangeUpdate() {
+      if (this.updatetipoCliente === "natural") {
+        // Mostrar campos para cliente natural
+        this.divDNIupdate = true;
+        this.divRUCupdate = false;
+        this.divRazonSocialupdate = false;
+      } else if (this.updatetipoCliente === "empresa") {
+        // Mostrar campos para cliente empresa
+        this.divDNIupdate = false;
+        this.divRUCupdate = true;
+        this.divRazonSocialupdate = true;
+      }
+    },
 
+    obtenerClientes() {
       this.$api
-        .get("/api/Clientes",headers)
+        .get("/api/Clientes")
         .then((response) => {
           this.clientes = response.data;
           console.log("Clientes obtenidos:", JSON.stringify(this.clientes));
@@ -542,6 +596,8 @@ export default {
       this.updaterazonSocial = cliente.razonSocial;
       this.updateruc = cliente.ruc;
 
+      // Aplica la lógica de visibilidad de campos
+      this.handleTipoClienteChangeUpdate();
       // Muestra el cuadro de diálogo de actualización
       this.updateShowCliente = true;
     },
@@ -554,15 +610,27 @@ export default {
         !this.tipoCliente ||
         !this.nombre ||
         !this.apellido ||
-        !this.dni ||
+        // !this.dni ||
         !this.telefono ||
         !this.correo ||
         !this.direccion ||
-        !this.estado ||
-        !this.razonSocial ||
-        !this.ruc
+        !this.estado
+        // || !this.razonSocial ||
+        // !this.ruc
       ) {
-        alert("Por favor, complete todos los campos.");
+        this.mostrarNotificacionFail("Por favor, complete todos los campos.");
+        return;
+      }
+
+      // Verificar si el DNI o RUC ya existen en la lista de clientes
+      const clienteExistente = this.clientes.find(
+        (cliente) => cliente.dni === this.dni || cliente.ruc === this.ruc
+      );
+
+      if (clienteExistente) {
+        this.mostrarNotificacionFail(
+          "El cliente con este DNI o RUC ya está registrado."
+        );
         return;
       }
 
@@ -580,31 +648,38 @@ export default {
         razonSocial: this.razonSocial,
         ruc: this.ruc,
       };
+
       console.log(cliente);
       this.$api
         .post(endpointURL, cliente)
         .then((response) => {
           console.log("Cliente guardado con éxito:", JSON.stringify(response));
+          // Actualizar la lista de clientes después de guardar
+          this.mostrarNotificacion("Se creo el nuevo cliente correctamente");
+          this.obtenerClientes();
+          this.cerrarDialog(); // Cerrar el diálogo
+          this.limpiar();
         })
         .catch((error) => {
           console.log("Error al guardar el cliente:", error);
         });
     },
+
     updateClient() {
       // Verificar si todos los campos están completos
       if (
         !this.updatetipoCliente ||
         !this.updatenombre ||
         !this.updateapellido ||
-        !this.updatedni ||
+        // !this.updatedni ||
         !this.updatetelefono ||
         !this.updatecorreo ||
         !this.updatedireccion ||
-        !this.updateestado ||
-        !this.updaterazonSocial ||
-        !this.updateruc
+        !this.updateestado
+        // || !this.updaterazonSocial ||
+        // !this.updateruc
       ) {
-        alert("Por favor, complete todos los campos.");
+        this.mostrarNotificacionFail("Se actualizo correctamente");
         return;
       }
 
@@ -632,6 +707,9 @@ export default {
             "Cliente actualizado con éxito:",
             JSON.stringify(response)
           );
+          this.mostrarNotificacion("Se actualizo correctamente");
+          this.cerrarDialogUpdate();
+          this.obtenerClientes();
         })
         .catch((error) => {
           console.log("Error al actualizar el cliente:", error);
@@ -643,21 +721,88 @@ export default {
         return;
       }
 
-      const endpointURL = "/api/Clientes/" + this.clienteParaEliminar.idCliente;
+      // Construir el objeto actualizado solo cambiando el estado
+      const client = {
+        ...this.clienteParaEliminar, // Copia los datos del cliente seleccionado
+        estado: false, // Cambia el estado a inactivo (eliminación lógica)
+      };
 
+      // Construir el endpoint correctamente
+      const endpointURL = `/api/Clientes/${this.clienteParaEliminar.idCliente}`;
+
+      // Hacer la solicitud PUT para actualizar el cliente
       this.$api
-        .delete(endpointURL)
+        .put(endpointURL, client)
         .then((response) => {
-          console.log("Cliente eliminado con éxito:", JSON.stringify(response));
+          console.log(
+            "Cliente actualizado con eliminación lógica:",
+            response.data
+          );
           this.obtenerClientes(); // Recargar la lista de clientes
           this.cerrarConfirmDialog(); // Cerrar el cuadro de confirmación
-          this.clienteParaEliminar = null; // Limpiar la selección del cliente
+          this.clienteParaEliminar = null; // Limpiar la selección
         })
         .catch((error) => {
-          console.error("Error al eliminar el cliente:", error);
+          console.error("Error al actualizar el cliente:", error);
         });
     },
+
+    async mostrarNotificacion(mensaje) {
+      // Crear y mostrar la notificación
+      const notification = document.createElement("div");
+      notification.className = "custom-notification";
+      notification.innerText = mensaje;
+
+      // Añadir la notificación al cuerpo del documento
+      document.body.appendChild(notification);
+
+      // Esperar unos segundos (pausa simulada)
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
+      // Ocultar y eliminar la notificación
+      notification.style.opacity = "0";
+      setTimeout(() => {
+        notification.remove();
+      }, 500); // Tiempo para el desvanecimiento
+    },
+    async mostrarNotificacionFail(mensaje) {
+      // Crear y mostrar la notificación
+      const notification = document.createElement("div");
+      notification.className = "custom-notification-fail";
+      notification.innerText = mensaje;
+
+      // Añadir la notificación al cuerpo del documento
+      document.body.appendChild(notification);
+
+      // Esperar unos segundos (pausa simulada)
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
+      // Ocultar y eliminar la notificación
+      notification.style.opacity = "0";
+      setTimeout(() => {
+        notification.remove();
+      }, 500); // Tiempo para el desvanecimiento
+    },
+    limpiar() {
+      // Restablece los valores de los campos del formulario
+      this.tipoCliente = "natural"; // Valor predeterminado
+      this.nombre = "";
+      this.apellido = "";
+      this.dni = "";
+      this.telefono = "";
+      this.correo = "";
+      this.direccion = "";
+      this.estado = "true"; // Activo por defecto
+      this.razonSocial = "";
+      this.ruc = "";
+
+      // Restablece la visibilidad de los campos
+      this.divDNI = true;
+      this.divRUC = false;
+      this.divRazonSocial = false;
+    },
   },
+
   mounted() {
     this.obtenerClientes(); // Llama al método para obtener los clientes al montar el componente
   },
@@ -1031,5 +1176,103 @@ h2#dialogTitle {
 
 .cancel-button:hover {
   background-color: #aaa;
+}
+.dialog-content {
+  width: 90%; /* Cambiado de 80% a 90% para hacerlo más ancho */
+  max-width: 900px; /* Ajusta el ancho máximo en píxeles */
+  max-height: 90%; /* Altura máxima */
+  background-color: white; /* Fondo blanco */
+  padding: 20px; /* Espaciado interno */
+  border-radius: 8px; /* Bordes redondeados */
+  overflow-y: auto; /* Activar scroll si es necesario */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+}
+
+.custom-notification {
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  background-color: #4caf50; /* Color verde */
+  color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  font-size: 16px;
+  font-weight: bold;
+  z-index: 1000;
+  opacity: 1;
+  transition: opacity 0.5s ease, transform 0.3s ease;
+  transform: translateY(0);
+}
+
+.custom-notification-fail {
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  background-color: #f81a1a; /* Color verde */
+  color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  font-size: 16px;
+  font-weight: bold;
+  z-index: 1000;
+  opacity: 1;
+  transition: opacity 0.5s ease, transform 0.3s ease;
+  transform: translateY(0);
+}
+.custom-notification.hide {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+  gap: 20px; /* Espaciado entre columnas */
+}
+
+.form-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog-content {
+  width: 90%;
+  max-width: 800px; /* Asegúrate de que el cuadro de diálogo sea ancho */
+  padding: 20px;
+  border-radius: 8px;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.submit-button {
+  grid-column: span 2; /* Hace que el botón ocupe ambas columnas */
+  margin-top: 20px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+  gap: 20px; /* Espaciado entre columnas */
+}
+
+.form-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog-content {
+  width: 90%;
+  max-width: 800px; /* Asegúrate de que el cuadro de diálogo sea ancho */
+  padding: 20px;
+  border-radius: 8px;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.submit-button {
+  grid-column: span 2; /* Hace que el botón ocupe ambas columnas */
+  margin-top: 20px;
 }
 </style>
