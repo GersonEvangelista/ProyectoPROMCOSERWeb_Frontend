@@ -613,8 +613,8 @@ export default {
         // !this.dni ||
         !this.telefono ||
         !this.correo ||
-        !this.direccion ||
-        !this.estado
+        !this.direccion
+        // !this.estado
         // || !this.razonSocial ||
         // !this.ruc
       ) {
